@@ -479,7 +479,7 @@ import SecurityScannerResults from '@/components/security';
 <SecurityScannerResults results={scannerJson} />
 ```
 
-Supported scanner fields include `id`, `ruleId`, `cve`, `title`, `message`, `description`, `severity`, `level`, `package`, `dependency`, `file`, `path`, `line`, `recommendation`, `fix`, and safe `http`/`https` URLs. Arrays, common `{ findings: [...] }` style objects, SARIF `runs[].results`, and npm-audit-style `vulnerabilities` maps are normalized into one warning shape.
+Supported scanner fields include `id`, `ruleId`, `check_id`, `check`, `cve`, `swc-id`, `title`, `check_name`, `message`, `description`, `severity`, `level`, `impact`, `package`, `dependency`, `file`, `path`, `filename`, `line`, `lineno`, `recommendation`, `fix`, and safe `http`/`https` URLs. Arrays, common `{ findings: [...] }` style objects, nested Slither-style `results.detectors`, Semgrep `results`, SARIF `runs[].results` with rule metadata, and npm-audit-style `vulnerabilities` or `advisories` maps are normalized into one warning shape.
 
 Severity is normalized case-insensitively: `critical`, `high`, `medium`, `moderate`, `low`, `info`, `warning`, and `error` are supported. `error` maps to `high`; `warning` and `moderate` map to `medium`; unknown values remain `unknown`.
 
