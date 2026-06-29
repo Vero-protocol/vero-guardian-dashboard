@@ -43,8 +43,12 @@ describe('useSearchIndex Hook', () => {
   ];
 
   beforeEach(() => {
-    // Clear localStorage before each test
     localStorage.clear();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('initialization', () => {
@@ -71,18 +75,27 @@ describe('useSearchIndex Hook', () => {
 
     it('should find contracts by name', () => {
       const { result } = renderHook(() => useSearchIndex({ initialContracts: mockContracts }));
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
       const results = result.current.search('task');
       expect(results.length).toBeGreaterThan(0);
     });
 
     it('should support search options', () => {
       const { result } = renderHook(() => useSearchIndex({ initialContracts: mockContracts }));
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
       const results = result.current.search('task', { maxResults: 1 });
       expect(results.length).toBeLessThanOrEqual(1);
     });
 
     it('should filter by type', () => {
       const { result } = renderHook(() => useSearchIndex({ initialContracts: mockContracts }));
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
       const results = result.current.search('registry', { typeFilter: ['vote'] });
       expect(results.every((r) => r.contract.type === 'vote')).toBe(true);
     });
@@ -125,6 +138,10 @@ describe('useSearchIndex Hook', () => {
 
       act(() => {
         result.current.addContracts(mockContracts);
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(300);
       });
 
       const results = result.current.search('task');
@@ -192,10 +209,10 @@ describe('useSearchIndex Hook', () => {
       localStorage.setItem('test-key-2', JSON.stringify(mockContracts));
       const { result } = renderHook(() => useSearchIndex({ storageKey: 'test-key-2' }));
 
-      // Wait for localStorage to be loaded
-      setTimeout(() => {
-        expect(result.current.contracts).toHaveLength(2);
-      }, 0);
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
+      expect(result.current.contracts).toHaveLength(2);
     });
   });
 

@@ -29,10 +29,12 @@ describe('WalletContext – setMockPublicKey production guard', () => {
    *   if (process.env.NODE_ENV === 'production') return;
    *   applyVerifiedPublicKey(key, DEFAULT_WALLET_PROVIDER_ID);
    */
+  const globalEnv = process.env;
+
   function makeSetMockPublicKey(applyVerifiedPublicKey: (key: string, providerId: string) => void) {
     const DEFAULT_WALLET_PROVIDER_ID = 'freighter';
     return function setMockPublicKey(key: string) {
-      if (process.env.NODE_ENV === 'production') {
+      if (globalEnv.NODE_ENV === 'production') {
         return;
       }
       applyVerifiedPublicKey(key, DEFAULT_WALLET_PROVIDER_ID);
@@ -40,18 +42,21 @@ describe('WalletContext – setMockPublicKey production guard', () => {
   }
 
   test('does NOT call applyVerifiedPublicKey when NODE_ENV is production', () => {
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      writable: true,
-      configurable: true,
-      value: 'production',
-    });
+    const originalValue = process.env.NODE_ENV;
+    // Set directly on the env object
+    globalEnv.NODE_ENV = 'production';
+    console.log('globalEnv.NODE_ENV:', globalEnv.NODE_ENV);
 
-    const applyVerifiedPublicKey = jest.fn();
-    const setMockPublicKey = makeSetMockPublicKey(applyVerifiedPublicKey);
+    try {
+      const applyVerifiedPublicKey = jest.fn();
+      const setMockPublicKey = makeSetMockPublicKey(applyVerifiedPublicKey);
 
-    setMockPublicKey('GABCDE12345');
+      setMockPublicKey('GABCDE12345');
 
-    expect(applyVerifiedPublicKey).not.toHaveBeenCalled();
+      expect(applyVerifiedPublicKey).not.toHaveBeenCalled();
+    } finally {
+      globalEnv.NODE_ENV = originalValue;
+    }
   });
 
   test('DOES call applyVerifiedPublicKey when NODE_ENV is development', () => {

@@ -130,13 +130,13 @@ export function positionWeightedMatch(query: string, haystack: string): number {
 
   // Boost score if match is at the beginning
   if (normalizedHaystack.startsWith(normalizedQuery)) {
-    return Math.min(100, baseScore * 1.3);
+    return baseScore * 1.3;
   }
 
   // Slight boost if query appears early in text
   const queryPos = normalizedHaystack.indexOf(normalizedQuery);
   if (queryPos !== -1 && queryPos < normalizedHaystack.length * 0.3) {
-    return Math.min(100, baseScore * 1.15);
+    return baseScore * 1.15;
   }
 
   return baseScore;

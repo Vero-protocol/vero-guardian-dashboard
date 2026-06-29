@@ -288,7 +288,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   /** DEV-ONLY: override the active public key for local development convenience. */
   const setMockPublicKey = useCallback(
     (key: string) => {
-      if (process.env.NODE_ENV === 'production') {
+      const globalEnv = typeof process !== 'undefined' ? process.env : {};
+      if (globalEnv.NODE_ENV === 'production') {
         return;
       }
       applyVerifiedPublicKey(key, DEFAULT_WALLET_PROVIDER_ID);
