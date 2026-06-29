@@ -10,4 +10,4 @@ export {
   type ContractStateSnapshot,
   type SnapshotDiff,
   type StateFieldDiff,
-} from './contractTimeTraveler';
+} from './contractTimeTravelerState';

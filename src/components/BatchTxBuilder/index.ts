@@ -14,7 +14,7 @@ export {
   shortenAddress,
   removeOperation,
   moveOperation,
-} from './batchTxBuilder';
+} from './batchTxState';
 export type {
   OperationType,
   OperationDraft,
@@ -24,4 +24,4 @@ export type {
   QueuedOperation,
   VoteChoice,
   DraftErrorCode,
-} from './batchTxBuilder';
+} from './batchTxState';

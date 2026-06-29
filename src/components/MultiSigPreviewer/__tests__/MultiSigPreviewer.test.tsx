@@ -7,7 +7,7 @@ import {
   parseProposalXdr,
   simulateProposal,
   type SorobanServer,
-} from '../multiSigPreviewer';
+} from '../multiSigPreviewerState';
 
 // ---------------------------------------------------------------------------
 // Helpers

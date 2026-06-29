@@ -10,7 +10,7 @@ import {
   formatStateValue,
   type ContractStateSnapshot,
   type SnapshotDiff,
-} from './contractTimeTraveler';
+} from './contractTimeTravelerState';
 
 // ---------------------------------------------------------------------------
 // Sub-components

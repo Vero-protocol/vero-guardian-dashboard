@@ -10,7 +10,7 @@ import {
   formatStateValue,
   MAX_SNAPSHOT_CACHE_SIZE,
   type ContractStateSnapshot,
-} from '../contractTimeTraveler';
+} from '../contractTimeTravelerState';
 
 // ---------------------------------------------------------------------------
 // Pure logic — diffStates

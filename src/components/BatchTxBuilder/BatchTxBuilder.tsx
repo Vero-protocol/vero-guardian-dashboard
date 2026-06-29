@@ -28,7 +28,7 @@ import {
   type QueuedOperation,
   type SorobanHaltOperationDraft,
   type SorobanVoteOperationDraft,
-} from './batchTxBuilder';
+} from './batchTxState';
 
 type BatchTxResult = BroadcastBatchTransactionResult | SorobanTransactionResult;
 

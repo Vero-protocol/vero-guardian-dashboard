@@ -3,14 +3,14 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import TaskCard, { matchesFilter, type TaskCardTask } from '@/components/TaskCard';
 import { ToastProvider } from '@/components/Toast';
 
-let _searchParams = new URLSearchParams();
+let mockSearchParams = new URLSearchParams();
 
 jest.mock('next/navigation', () => ({
-  useSearchParams: () => _searchParams,
+  useSearchParams: () => mockSearchParams,
   useRouter: () => ({
     replace: (url: string) => {
       const qs = url.includes('?') ? url.split('?')[1] : '';
-      _searchParams = new URLSearchParams(qs);
+      mockSearchParams = new URLSearchParams(qs);
     },
   }),
   usePathname: () => '/',
@@ -67,7 +67,7 @@ describe('matchesFilter', () => {
 
 describe('TaskCard', () => {
   beforeEach(() => {
-    _searchParams = new URLSearchParams();
+    mockSearchParams = new URLSearchParams();
   });
 
   it('renders a pending task title and action button from payload data', () => {
@@ -177,7 +177,7 @@ describe('TaskCard', () => {
   });
 
   it('applies URL search param filters on render', () => {
-    _searchParams = new URLSearchParams('status=completed');
+    mockSearchParams = new URLSearchParams('status=completed');
 
     const tasks = [
       createTask({ id: '1', title: 'Pending task', status: 'pending', is_done: false }),
@@ -188,13 +188,13 @@ describe('TaskCard', () => {
     expect(screen.queryByText('Pending task')).not.toBeInTheDocument();
     expect(screen.getByText('Completed task')).toBeInTheDocument();
 
-    _searchParams = new URLSearchParams();
+    mockSearchParams = new URLSearchParams();
     rerender(<TaskCard tasks={tasks} />, { wrapper: Wrapper });
     expect(screen.getByText('Pending task')).toBeInTheDocument();
   });
 
   it('shows no results message when filters match nothing', () => {
-    _searchParams = new URLSearchParams('status=completed');
+    mockSearchParams = new URLSearchParams('status=completed');
 
     render(
       <TaskCard
@@ -207,7 +207,7 @@ describe('TaskCard', () => {
   });
 
   it('shows clear filters link when filter is active', () => {
-    _searchParams = new URLSearchParams('status=completed');
+    mockSearchParams = new URLSearchParams('status=completed');
 
     render(<TaskCard tasks={[createTask()]} />, { wrapper: Wrapper });
 
@@ -215,11 +215,11 @@ describe('TaskCard', () => {
   });
 
   it('clears filters via router replace when clear is clicked', () => {
-    _searchParams = new URLSearchParams('status=completed');
+    mockSearchParams = new URLSearchParams('status=completed');
 
     render(<TaskCard tasks={[createTask({ id: '1', title: 'A task' })]} />, { wrapper: Wrapper });
 
     fireEvent.click(screen.getByText(/clear filters/i));
-    expect(_searchParams.toString()).toBe('');
+    expect(mockSearchParams.toString()).toBe('');
   });
 });

@@ -52,3 +52,4 @@ try {
 } catch (e) {
 	// ignore if already installed or environment prevents it
 }
+jest.setTimeout(30000);

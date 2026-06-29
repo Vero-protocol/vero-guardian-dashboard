@@ -7,4 +7,4 @@ export {
   type ParsedProposal,
   type SimulationResult,
   type SignerThreshold,
-} from './multiSigPreviewer';
+} from './multiSigPreviewerState';
