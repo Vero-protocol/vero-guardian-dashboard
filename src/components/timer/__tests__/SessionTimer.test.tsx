@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
-import SessionTimer, { formatAuditTime } from '../SessionTimer';
+import SessionTimer, { formatAuditTime } from '../StateStateStateStateStateStateStateStateStateStateSessionTimer';
 
 describe('formatAuditTime', () => {
   test('formats minutes and seconds without dropping partial seconds', () => {

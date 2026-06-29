@@ -1,4 +1,4 @@
-export { default } from './GasHeatmap';
+export { default } from './StateStateStateStateStateGasHeatmap';
 export {
   GAS_METRICS,
   METRIC_LABEL_KEYS,
@@ -6,5 +6,5 @@ export {
   buildHeatmap,
   findHotspots,
   formatGas,
-} from './GasHeatmap';
-export type { FunctionGasUsage, GasMetric, GasHotspot, HeatmapCell } from './GasHeatmap';
+} from './StateStateStateStateStateGasHeatmap';
+export type { FunctionGasUsage, GasMetric, GasHotspot, HeatmapCell } from './StateStateStateStateStateGasHeatmap';

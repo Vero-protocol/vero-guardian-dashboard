@@ -1,4 +1,4 @@
-export { MultiSigPreviewer, type MultiSigPreviewerProps, default } from './MultiSigPreviewer';
+export { MultiSigPreviewer, type MultiSigPreviewerProps, default } from './StateStateStateStateStateMultiSigPreviewer';
 export {
   parseProposalXdr,
   computeThreshold,
@@ -7,4 +7,4 @@ export {
   type ParsedProposal,
   type SimulationResult,
   type SignerThreshold,
-} from './multiSigPreviewerState';
+} from './StateStateStateStateStatemultiSigPreviewerState';

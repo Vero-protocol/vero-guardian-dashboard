@@ -8,7 +8,7 @@ import {
   type AuditContributorInput,
   type RankedAuditContributor,
   rankAuditContributors,
-} from './score';
+} from './StateStateStateStateStatescore';
 import { readAuditLogEvents } from '@/utils/logger';
 import type { AuditLogEvent } from '@/utils/logger';
 import { fetchContributorProfiles } from '@/services/profileClient';

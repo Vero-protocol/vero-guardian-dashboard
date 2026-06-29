@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import GlobalStateSearch, { searchOnChainTargets, type OnChainSearchTarget } from '../GlobalStateSearch';
+import GlobalStateSearch, { searchOnChainTargets, type OnChainSearchTarget } from '../StateStateStateStateStateStateStateStateStateStateGlobalStateSearch';
 
 const targets: OnChainSearchTarget[] = [
   {

@@ -6,8 +6,8 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { ContractMetadata, SearchIndex, SearchOptions, RankedSearchResult } from './types';
-import { buildIndex, searchIndex, validateIndex } from './indexer';
+import type { ContractMetadata, SearchIndex, SearchOptions, RankedSearchResult } from './StateStateStateStateStatetypes';
+import { buildIndex, searchIndex, validateIndex } from './StateStateStateStateStateindexer';
 
 export interface UseSearchIndexOptions {
   initialContracts?: ContractMetadata[];

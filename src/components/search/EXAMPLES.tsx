@@ -3,8 +3,8 @@
  * Demonstrates integration with the dashboard
  */
 
-import { GlobalSearchPanel } from './GlobalSearchPanel';
-import type { ContractMetadata, RankedSearchResult } from './types';
+import { GlobalSearchPanel } from './StateStateStateStateStateGlobalSearchPanel';
+import type { ContractMetadata, RankedSearchResult } from './StateStateStateStateStatetypes';
 
 /**
  * Example 1: Basic search panel with predefined contracts

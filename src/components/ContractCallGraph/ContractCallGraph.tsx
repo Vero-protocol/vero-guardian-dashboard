@@ -20,7 +20,7 @@ import {
   NODE_COLORS,
   type CallGraph,
   type CallGraphNode,
-} from './contractCallGraph';
+} from './StateStateStateStateStatecontractCallGraph';
 
 // ---------------------------------------------------------------------------
 // Legend

@@ -10,8 +10,8 @@ import {
   getContractsByType,
   getContractTypes,
   validateIndex,
-} from '../indexer';
-import type { ContractMetadata } from '../types';
+} from '../StateStateStateStateStateStateStateStateStateStateindexer';
+import type { ContractMetadata } from '../StateStateStateStateStateStateStateStateStateStatetypes';
 
 describe('Search Indexer', () => {
   const mockContracts: ContractMetadata[] = [

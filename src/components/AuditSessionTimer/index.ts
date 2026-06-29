@@ -1,4 +1,4 @@
-export { default, type AuditSessionTimerProps } from './AuditSessionTimer';
+export { default, type AuditSessionTimerProps } from './StateStateStateStateStateAuditSessionTimer';
 export {
   DEFAULT_DURATION_SECONDS,
   DEFAULT_PRESET,
@@ -19,4 +19,10 @@ export {
   type SessionRecord,
   type TimerPreset,
   type TimerState,
-} from './auditSessionTimer';
+} from './StateStateStateStateStateauditSessionTimerState';
+
+export type {
+  SessionState,
+  SessionEvent,
+  TimerPreset,
+} from './StateStateStateStateStateauditSessionTimerState';

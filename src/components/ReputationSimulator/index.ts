@@ -1,4 +1,4 @@
-export { ReputationSimulator, default } from './ReputationSimulator';
+export { ReputationSimulator, default } from './StateStateStateStateStateReputationSimulator';
 export {
   simulateScoreImpact,
   simulateMultipleActions,
@@ -7,4 +7,4 @@ export {
   MIN_REPUTATION,
   MAX_REPUTATION,
   type SimulatorAction,
-} from './reputationSimulator';
+} from './StateStateStateStateStatereputationSimulator';

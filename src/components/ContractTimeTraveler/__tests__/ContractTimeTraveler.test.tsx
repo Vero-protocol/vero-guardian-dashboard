@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from '@jest/globals';
-import ContractTimeTraveler from '../ContractTimeTraveler';
+import ContractTimeTraveler from '../StateStateStateStateStateStateStateStateStateStateContractTimeTraveler';
 import {
   appendSnapshot,
   DEFAULT_CONTRACT_HISTORY,
@@ -10,7 +10,7 @@ import {
   formatStateValue,
   MAX_SNAPSHOT_CACHE_SIZE,
   type ContractStateSnapshot,
-} from '../contractTimeTravelerState';
+} from '../StateStateStateStateStateStateStateStateStateStatecontractTimeTravelerState';
 
 // ---------------------------------------------------------------------------
 // Pure logic — diffStates

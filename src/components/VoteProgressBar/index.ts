@@ -1,2 +1,2 @@
-export { default } from './VoteProgressBar';
-export type { VoteProgressBarProps } from './VoteProgressBar';
+export { default } from './StateStateStateStateStateVoteProgressBar';
+export type { VoteProgressBarProps } from './StateStateStateStateStateVoteProgressBar';

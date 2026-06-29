@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import SecurityScannerResults, { getSecurityScannerSnapshot } from '../SecurityScannerResults';
+import SecurityScannerResults, { getSecurityScannerSnapshot } from '../StateStateStateStateStateStateStateStateStateStateSecurityScannerResults';
 
 describe('SecurityScannerResults', () => {
   const scannerResults = {

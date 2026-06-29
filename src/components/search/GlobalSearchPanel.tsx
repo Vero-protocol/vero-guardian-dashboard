@@ -8,11 +8,11 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { ChevronDown, RefreshCw } from 'lucide-react';
-import { SearchInput } from './SearchInput';
-import { SearchResults } from './SearchResults';
-import type { RankedSearchResult, SearchOptions } from './types';
-import { useSearchIndex } from './useSearchIndex';
-import type { ContractMetadata } from './types';
+import { SearchInput } from './StateStateStateStateStateSearchInput';
+import { SearchResults } from './StateStateStateStateStateSearchResults';
+import type { RankedSearchResult, SearchOptions } from './StateStateStateStateStatetypes';
+import { useSearchIndex } from './StateStateStateStateStateuseSearchIndex';
+import type { ContractMetadata } from './StateStateStateStateStatetypes';
 
 export interface GlobalSearchPanelProps {
   contracts?: ContractMetadata[];

@@ -6,7 +6,7 @@
  */
 
 import { Badge } from 'lucide-react';
-import type { RankedSearchResult } from './types';
+import type { RankedSearchResult } from './StateStateStateStateStatetypes';
 
 const TYPE_STYLES: Record<string, string> = {
   task: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800',

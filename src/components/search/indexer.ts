@@ -3,8 +3,8 @@
  * Builds and maintains an efficient index of contracts and functions
  */
 
-import type { ContractMetadata, SearchIndex, SearchOptions, RankedSearchResult, SearchResult } from './types';
-import { multiFieldFuzzyMatch, tokenize, normalizeText } from './fuzzySearch';
+import type { ContractMetadata, SearchIndex, SearchOptions, RankedSearchResult, SearchResult } from './StateStateStateStateStatetypes';
+import { multiFieldFuzzyMatch, tokenize, normalizeText } from './StateStateStateStateStatefuzzySearch';
 
 /**
  * Creates an empty search index

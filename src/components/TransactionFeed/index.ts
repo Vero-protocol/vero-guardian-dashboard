@@ -1,14 +1,14 @@
-export { default } from './TransactionFeed';
+export { default } from './StateStateStateStateStateTransactionFeed';
 export {
   MAX_FEED_ENTRIES,
   createHorizonTransactionStream,
   toFeedTransaction,
   truncateMiddle,
-} from './TransactionFeed';
+} from './StateStateStateStateStateTransactionFeed';
 export type {
   FeedConnectionStatus,
   FeedTransaction,
   HorizonTransactionRecord,
   TransactionStreamHandlers,
   TransactionStreamSubscriber,
-} from './TransactionFeed';
+} from './StateStateStateStateStateTransactionFeed';

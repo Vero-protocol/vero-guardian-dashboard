@@ -13,7 +13,7 @@ import {
   toStellarOperation,
   validateDraft,
   type QueuedOperation,
-} from '../batchTxState';
+} from '../StateStateStateStateStateStateStateStateStateStatebatchTxState';
 
 const VALID_DESTINATION = StellarSdk.Keypair.random().publicKey();
 const SOURCE = StellarSdk.Keypair.random().publicKey();

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from '@jest/globals';
-import IPFSDocViewer from '../IPFSDocViewer';
-import { buildGatewayUrl, IPFS_GATEWAY, isValidIpfsHash } from '../ipfsDocViewer';
+import IPFSDocViewer from '../StateStateStateStateStateStateStateStateStateStateIPFSDocViewer';
+import { buildGatewayUrl, IPFS_GATEWAY, isValidIpfsHash } from '../StateStateStateStateStateStateStateStateStateStateipfsDocViewer';
 
 // ---------------------------------------------------------------------------
 // Pure logic — isValidIpfsHash

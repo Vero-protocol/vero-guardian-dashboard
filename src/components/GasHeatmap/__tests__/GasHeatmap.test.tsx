@@ -6,7 +6,7 @@ import GasHeatmap, {
   formatGas,
   GAS_METRICS,
   type FunctionGasUsage,
-} from '../GasHeatmap';
+} from '../StateStateStateStateStateStateStateStateStateStateGasHeatmap';
 
 const SAMPLE: FunctionGasUsage[] = [
   { functionName: 'alpha', costs: { cpuInsns: 100, memBytes: 200, ledgerReads: 4, ledgerWrites: 1, events: 0 } },

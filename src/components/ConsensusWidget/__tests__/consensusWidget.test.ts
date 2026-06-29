@@ -1,4 +1,4 @@
-import { calculateConsensusProgress, DEFAULT_CONSENSUS_THRESHOLD } from '../consensusWidget';
+import { calculateConsensusProgress, DEFAULT_CONSENSUS_THRESHOLD } from '../StateStateStateStateStateStateStateStateStateStateconsensusWidget';
 
 describe('calculateConsensusProgress', () => {
   it('returns 0 when threshold is 0', () => {

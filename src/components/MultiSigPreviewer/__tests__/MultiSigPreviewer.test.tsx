@@ -1,13 +1,13 @@
 import * as StellarSdk from '@stellar/stellar-sdk';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, jest } from '@jest/globals';
-import { MultiSigPreviewer } from '../MultiSigPreviewer';
+import { MultiSigPreviewer } from '../StateStateStateStateStateStateStateStateStateStateMultiSigPreviewer';
 import {
   computeThreshold,
   parseProposalXdr,
   simulateProposal,
   type SorobanServer,
-} from '../multiSigPreviewerState';
+} from '../StateStateStateStateStateStateStateStateStateStatemultiSigPreviewerState';
 
 // ---------------------------------------------------------------------------
 // Helpers

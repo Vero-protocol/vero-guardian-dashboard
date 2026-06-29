@@ -20,7 +20,7 @@ import {
   totalAuditedSeconds,
   type TimerPreset,
   type TimerState,
-} from './auditSessionTimer';
+} from './StateStateStateStateStateauditSessionTimerState';
 
 // ---------------------------------------------------------------------------
 // SVG circular progress ring

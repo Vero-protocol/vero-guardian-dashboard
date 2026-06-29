@@ -11,7 +11,7 @@ import {
   fuzzyMatch,
   positionWeightedMatch,
   multiFieldFuzzyMatch,
-} from '../fuzzySearch';
+} from '../StateStateStateStateStateStateStateStateStateStatefuzzySearch';
 
 describe('Fuzzy Search', () => {
   describe('normalizeText', () => {

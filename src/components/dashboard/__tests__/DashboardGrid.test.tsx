@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import DashboardGrid, { DashboardWidget } from '../DashboardGrid';
+import DashboardGrid, { DashboardWidget } from '../StateStateStateStateStateStateStateStateStateStateDashboardGrid';
 import { GridStack } from 'gridstack';
 
 // Mock GridStack to avoid actual DOM manipulations in Jest JSDOM env

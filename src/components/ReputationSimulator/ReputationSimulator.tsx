@@ -6,7 +6,7 @@ import {
   ACTION_DELTAS,
   type SimulatorAction,
   simulateMultipleActions,
-} from './reputationSimulator';
+} from './StateStateStateStateStatereputationSimulator';
 
 interface Props {
   /** Current on-chain reputation score from getReputation(). */

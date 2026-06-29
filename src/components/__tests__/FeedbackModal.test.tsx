@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import FeedbackModal from '../FeedbackModal';
+import FeedbackModal from '../StateStateStateStateStateStateStateStateStateStateFeedbackModal';
 
 describe('FeedbackModal', () => {
   beforeEach(() => {

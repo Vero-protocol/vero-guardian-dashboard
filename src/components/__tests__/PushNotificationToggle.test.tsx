@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import PushNotificationToggle from '../PushNotificationToggle';
+import PushNotificationToggle from '../StateStateStateStateStateStateStateStateStateStatePushNotificationToggle';
 
 describe('PushNotificationToggle', () => {
   const requestPermission = jest.fn();

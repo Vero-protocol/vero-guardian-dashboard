@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { buildTourSteps, hasTourBeenSeen, markTourSeen } from './onboardingTour';
+import { buildTourSteps, hasTourBeenSeen, markTourSeen } from './StateStateStateStateStateonboardingTour';
 
 interface OnboardingTourProps {
   /** Force the tour to start regardless of localStorage flag (for testing/demo). */

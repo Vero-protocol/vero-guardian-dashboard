@@ -8,7 +8,7 @@ import TransactionFeed, {
   type HorizonTransactionRecord,
   type TransactionStreamHandlers,
   type TransactionStreamSubscriber,
-} from '../TransactionFeed';
+} from '../StateStateStateStateStateStateStateStateStateStateTransactionFeed';
 
 jest.mock('@/hooks/useChainState', () => ({
   useChainState: () => ({

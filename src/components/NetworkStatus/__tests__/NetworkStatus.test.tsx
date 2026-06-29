@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { NetworkProvider } from '@/context/NetworkContext';
-import NetworkStatus, { HEARTBEAT_INTERVAL_MS, RPC_REQUEST_TIMEOUT_MS, fetchRpcHealth } from '../NetworkStatus';
+import NetworkStatus, { HEARTBEAT_INTERVAL_MS, RPC_REQUEST_TIMEOUT_MS, fetchRpcHealth } from '../StateStateStateStateStateStateStateStateStateStateNetworkStatus';
 
 function renderWithProviders(element: React.ReactElement) {
   return render(<NetworkProvider>{element}</NetworkProvider>);

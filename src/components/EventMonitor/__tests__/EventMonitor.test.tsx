@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { renderHook, type RenderHookResult } from '@testing-library/react';
 import { act } from 'react';
 import { useEvents, type UseEventsResult } from '@/hooks/useEvents';
-import EventMonitor from '../EventMonitor';
+import EventMonitor from '../StateStateStateStateStateStateStateStateStateStateEventMonitor';
 
 function emitEvent(event: Parameters<UseEventsResult['emit']>[0]) {
   let hook: RenderHookResult<UseEventsResult, unknown>;

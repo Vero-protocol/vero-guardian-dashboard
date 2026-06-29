@@ -11,7 +11,7 @@ import GasHeatmap, {
   formatGas,
   GAS_METRICS,
   type FunctionGasUsage,
-} from '../GasHeatmap';
+} from '../StateStateStateStateStateStateStateStateStateStateGasHeatmap';
 
 const SAMPLE: FunctionGasUsage[] = [
   { functionName: 'cast_vote', costs: { cpuInsns: 12_500_000, memBytes: 524_288, ledgerReads: 8, ledgerWrites: 3, events: 2 } },

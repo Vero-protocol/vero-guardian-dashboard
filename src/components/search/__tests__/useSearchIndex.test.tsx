@@ -3,8 +3,8 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { useSearchIndex } from '../useSearchIndex';
-import type { ContractMetadata } from '../types';
+import { useSearchIndex } from '../StateStateStateStateStateStateStateStateStateStateuseSearchIndex';
+import type { ContractMetadata } from '../StateStateStateStateStateStateStateStateStateStatetypes';
 
 describe('useSearchIndex Hook', () => {
   const mockContracts: ContractMetadata[] = [

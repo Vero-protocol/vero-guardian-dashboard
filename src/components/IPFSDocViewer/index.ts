@@ -1,3 +1,3 @@
-export { IPFSDocViewer, type IPFSDocViewerProps } from './IPFSDocViewer';
-export { isValidIpfsHash, buildGatewayUrl, IPFS_GATEWAY } from './ipfsDocViewer';
-export { default } from './IPFSDocViewer';
+export { IPFSDocViewer, type IPFSDocViewerProps } from './StateStateStateStateStateIPFSDocViewer';
+export { isValidIpfsHash, buildGatewayUrl, IPFS_GATEWAY } from './StateStateStateStateStateipfsDocViewer';
+export { default } from './StateStateStateStateStateIPFSDocViewer';

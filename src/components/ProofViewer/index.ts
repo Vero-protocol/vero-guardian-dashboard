@@ -1,1 +1,1 @@
-export { default as ProofHistoryTable } from './ProofHistoryTable';
+export { default as ProofHistoryTable } from './StateStateStateStateStateProofHistoryTable';

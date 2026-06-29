@@ -10,7 +10,7 @@ import {
   type ParsedProposal,
   type SimulationResult,
   type SignerThreshold,
-} from './multiSigPreviewerState';
+} from './StateStateStateStateStatemultiSigPreviewerState';
 import { DEFAULT_SOROBAN_RPC_URL, DEFAULT_NETWORK_PASSPHRASE } from '@/services/rpc';
 
 export interface MultiSigPreviewerProps {

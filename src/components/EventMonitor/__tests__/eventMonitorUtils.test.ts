@@ -4,7 +4,7 @@ import {
   filterEvents,
   formatTimestamp,
   getEventTypeOption,
-} from '../eventMonitorUtils';
+} from '../StateStateStateStateStateStateStateStateStateStateeventMonitorUtils';
 
 describe('getEventTypeOption', () => {
   it('returns the vote option for vote type', () => {

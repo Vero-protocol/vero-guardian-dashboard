@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, jest, afterEach, beforeEach } from '@jest/globals';
-import AuditSessionTimer from '../AuditSessionTimer';
+import AuditSessionTimer from '../StateStateStateStateStateStateStateStateStateStateAuditSessionTimer';
 import {
   formatDuration,
   formatTime,
@@ -15,7 +15,8 @@ import {
   tick,
   totalAuditedSeconds,
   type TimerState,
-} from '../auditSessionTimer';
+  type SessionRecord,
+} from '../StateStateStateStateStateStateStateStateStateStateauditSessionTimerState';
 
 // ---------------------------------------------------------------------------
 // Pure logic — formatTime

@@ -9,7 +9,7 @@ import {
   DEFAULT_CONSENSUS_THRESHOLD,
   calculateConsensusProgress,
   type ConsensusData,
-} from './consensusWidget';
+} from './StateStateStateStateStateconsensusWidget';
 
 export interface ConsensusWidgetProps {
   /** PR task ID to track consensus for. */

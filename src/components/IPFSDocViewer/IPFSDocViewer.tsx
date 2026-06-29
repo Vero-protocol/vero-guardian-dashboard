@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { buildGatewayUrl, isValidIpfsHash } from './ipfsDocViewer';
+import { buildGatewayUrl, isValidIpfsHash } from './StateStateStateStateStateipfsDocViewer';
 
 export interface IPFSDocViewerProps {
   /** Pre-set IPFS CID to load immediately. */

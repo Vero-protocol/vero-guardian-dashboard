@@ -9,7 +9,7 @@ import {
   filterEvents,
   formatTimestamp,
   getEventTypeOption,
-} from './eventMonitorUtils';
+} from './StateStateStateStateStateeventMonitorUtils';
 import type { ProtocolEvent } from '@/hooks/useEvents';
 
 const MAX_DISPLAY_METADATA_KEYS = 5;

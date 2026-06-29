@@ -1,5 +1,5 @@
-export { default } from './BatchTxBuilder';
-export type { BatchBroadcaster, BatchTxBuilderProps } from './BatchTxBuilder';
+export { default } from './StateStateStateStateStateBatchTxBuilder';
+export type { BatchBroadcaster, BatchTxBuilderProps } from './StateStateStateStateStateBatchTxBuilder';
 export {
   OPERATION_TYPES,
   MAX_BATCH_OPERATIONS,
@@ -14,7 +14,7 @@ export {
   shortenAddress,
   removeOperation,
   moveOperation,
-} from './batchTxState';
+} from './StateStateStateStateStatebatchTxState';
 export type {
   OperationType,
   OperationDraft,
@@ -24,4 +24,4 @@ export type {
   QueuedOperation,
   VoteChoice,
   DraftErrorCode,
-} from './batchTxState';
+} from './StateStateStateStateStatebatchTxState';

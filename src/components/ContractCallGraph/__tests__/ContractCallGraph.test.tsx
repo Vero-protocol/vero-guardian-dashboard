@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, jest, beforeAll } from '@jest/globals';
-import ContractCallGraph from '../ContractCallGraph';
+import ContractCallGraph from '../StateStateStateStateStateStateStateStateStateStateContractCallGraph';
 import {
   buildCytoscapeElements,
   computeInDegree,
@@ -10,7 +10,7 @@ import {
   getCallees,
   getCallers,
   type CallGraph,
-} from '../contractCallGraph';
+} from '../StateStateStateStateStateStateStateStateStateStatecontractCallGraph';
 
 // ---------------------------------------------------------------------------
 // Mock cytoscape — it uses window/document APIs not available in jsdom fully.

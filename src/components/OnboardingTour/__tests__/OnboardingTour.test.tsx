@@ -1,12 +1,12 @@
 import { render } from '@testing-library/react';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { OnboardingTour } from '../OnboardingTour';
+import { OnboardingTour } from '../StateStateStateStateStateStateStateStateStateStateOnboardingTour';
 import {
   buildTourSteps,
   hasTourBeenSeen,
   markTourSeen,
   TOUR_SEEN_KEY,
-} from '../onboardingTour';
+} from '../StateStateStateStateStateStateStateStateStateStateonboardingTour';
 
 // ---------------------------------------------------------------------------
 // Pure logic — buildTourSteps

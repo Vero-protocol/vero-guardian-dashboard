@@ -3,9 +3,9 @@
 import { AlertTriangle, ShieldCheck, ShieldOff } from 'lucide-react';
 import { useCallback, useMemo, useState, type ChangeEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { parseVulnerabilityResults, summarizeVulnerabilities } from './vulnerabilityParser';
-import VulnerabilityList from './VulnerabilityList';
-import type { VulnerabilityFinding, VulnerabilityParseResult, VulnerabilitySummary } from './types';
+import { parseVulnerabilityResults, summarizeVulnerabilities } from './StateStateStateStateStatevulnerabilityParser';
+import VulnerabilityList from './StateStateStateStateStateVulnerabilityList';
+import type { VulnerabilityFinding, VulnerabilityParseResult, VulnerabilitySummary } from './StateStateStateStateStatetypes';
 
 export interface SecurityScannerSnapshot {
   findings: VulnerabilityFinding[];
