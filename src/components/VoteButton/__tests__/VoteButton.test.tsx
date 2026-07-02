@@ -37,7 +37,6 @@ const mockCastVote = castVote as jest.MockedFunction<typeof castVote>;
 const mockUseRole = useRole as jest.MockedFunction<typeof useRole>;
 const mockUseNetwork = useNetwork as jest.MockedFunction<typeof useNetwork>;
 const mockUseToast = useToast as jest.MockedFunction<typeof useToast>;
-const mockUseNetwork = useNetwork as jest.MockedFunction<typeof useNetwork>;
 const mockShowToast = jest.fn();
 const mockRefreshRole = jest.fn();
 

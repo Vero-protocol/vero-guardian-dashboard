@@ -70,7 +70,7 @@ describe('Leaderboard aggregation', () => {
 
     const list = await screen.findByRole('list');
 
-    const items = within(list).getAllByRole('listitem');
+    const items = await within(list).findAllByRole('listitem');
 
     // Bob should have higher score because of critical finding
     expect(items[0]).toHaveTextContent('Bob');
@@ -80,7 +80,7 @@ describe('Leaderboard aggregation', () => {
     recentBtn.click();
 
     const listRecent = await screen.findByRole('list');
-    const itemsRecent = within(listRecent).getAllByRole('listitem');
+    const itemsRecent = await within(listRecent).findAllByRole('listitem');
     expect(itemsRecent[0]).toHaveTextContent('Bob');
 
     // ensure Alice is present as well

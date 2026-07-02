@@ -157,7 +157,7 @@ describe('Fuzzy Search', () => {
     it('should apply custom weights', () => {
       const fields = {
         name: 'test',
-        description: 'test',
+        description: 'something test',
       };
       const score1 = multiFieldFuzzyMatch('test', fields, { name: 1.0, description: 3.0 });
       const score2 = multiFieldFuzzyMatch('test', fields, { name: 3.0, description: 1.0 });
