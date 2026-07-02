@@ -450,8 +450,6 @@ async function decryptRecord(
   key: CryptoKey,
   record: EncryptedAuditLogRecord,
 ): Promise<AuditLogEvent> {
-  const iv = new Uint8Array(base64ToBytes(record.iv));
-  const ciphertext = new Uint8Array(base64ToBytes(record.ciphertext));
   const iv = base64ToBytes(record.iv);
   const ciphertext = base64ToBytes(record.ciphertext);
   const decrypted = await cryptoProvider.subtle.decrypt(
