@@ -106,6 +106,16 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
 
+async function renderWallet(children: React.ReactNode) {
+  let result: ReturnType<typeof render>;
+
+  await act(async () => {
+    result = render(children);
+  });
+
+  return result!;
+}
+
 function TestComponent() {
   const { publicKey, isConnected, isLoading, error, connect, disconnect } = useWallet();
 
@@ -165,7 +175,7 @@ describe('WalletContext', () => {
     });
 
     it('should initialize with loading state', async () => {
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
@@ -194,14 +204,16 @@ describe('WalletContext', () => {
 
   describe('connect', () => {
     it('should connect wallet successfully with Freighter v6 requestAccess', async () => {
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
       );
 
       await waitFor(() => expect(screen.getByTestId('is-loading')).toHaveTextContent('Ready'));
-      fireEvent.click(screen.getByTestId('connect-btn'));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('connect-btn'));
+      });
 
       await waitFor(() => expect(screen.getByTestId('public-key')).toHaveTextContent(PUBLIC_KEY));
       expect(mockedFreighter.requestAccess).toHaveBeenCalled();
@@ -210,7 +222,7 @@ describe('WalletContext', () => {
     });
 
     it('should persist publicKey to localStorage on successful connection', async () => {
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
@@ -244,7 +256,7 @@ describe('WalletContext', () => {
       localStorage.setItem(STORAGE_KEY, PUBLIC_KEY);
       mockedFreighter.isConnected.mockResolvedValue({ isConnected: false });
 
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
@@ -260,7 +272,7 @@ describe('WalletContext', () => {
       mockedFreighter.isConnected.mockResolvedValue({ isConnected: true });
       mockedFreighter.getAddress.mockResolvedValue({ address: OTHER_PUBLIC_KEY });
 
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
@@ -274,14 +286,16 @@ describe('WalletContext', () => {
     it('should handle connection error when Freighter is not installed', async () => {
       walletWindow.freighter = undefined;
 
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
       );
 
       await waitFor(() => expect(screen.getByTestId('is-loading')).toHaveTextContent('Ready'));
-      fireEvent.click(screen.getByTestId('connect-btn'));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('connect-btn'));
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId('error')).toHaveTextContent('Freighter wallet is not installed');
@@ -293,14 +307,16 @@ describe('WalletContext', () => {
       const errorMessage = 'User denied access';
       mockedFreighter.requestAccess.mockRejectedValue(new Error(errorMessage));
 
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
       );
 
       await waitFor(() => expect(screen.getByTestId('is-loading')).toHaveTextContent('Ready'));
-      fireEvent.click(screen.getByTestId('connect-btn'));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('connect-btn'));
+      });
 
       await waitFor(() => expect(screen.getByTestId('error')).toHaveTextContent(errorMessage));
       expect(screen.getByTestId('is-connected')).toHaveTextContent('Disconnected');
@@ -313,14 +329,16 @@ describe('WalletContext', () => {
       });
       mockedFreighter.requestAccess.mockReturnValue(connectPromise);
 
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
       );
 
       await waitFor(() => expect(screen.getByTestId('is-loading')).toHaveTextContent('Ready'));
-      fireEvent.click(screen.getByTestId('connect-btn'));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('connect-btn'));
+      });
       resolveConnect!({ address: PUBLIC_KEY });
 
       await waitFor(() => expect(screen.getByTestId('public-key')).toHaveTextContent(PUBLIC_KEY));
@@ -333,7 +351,7 @@ describe('WalletContext', () => {
       mockedFreighter.isConnected.mockResolvedValue({ isConnected: true });
       mockedFreighter.getAddress.mockResolvedValue({ address: PUBLIC_KEY });
 
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
@@ -341,7 +359,9 @@ describe('WalletContext', () => {
 
       await waitFor(() => expect(screen.getByTestId('is-connected')).toHaveTextContent('Connected'));
 
-      fireEvent.click(screen.getByTestId('disconnect-btn'));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('disconnect-btn'));
+      });
 
       expect(screen.getByTestId('public-key')).toHaveTextContent('No key');
       expect(screen.getByTestId('is-connected')).toHaveTextContent('Disconnected');
@@ -353,7 +373,7 @@ describe('WalletContext', () => {
       mockedFreighter.isConnected.mockResolvedValue({ isConnected: true });
       mockedFreighter.getAddress.mockResolvedValue({ address: PUBLIC_KEY });
 
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
@@ -362,7 +382,9 @@ describe('WalletContext', () => {
       await waitFor(async () => expect(await getSessionItem(STORAGE_KEY)).toBe(PUBLIC_KEY));
       await waitFor(() => expect(getSessionItem(STORAGE_KEY)).resolves.toBe(PUBLIC_KEY));
 
-      fireEvent.click(screen.getByTestId('disconnect-btn'));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('disconnect-btn'));
+      });
 
       expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
     });
@@ -374,7 +396,7 @@ describe('WalletContext', () => {
       mockedFreighter.isConnected.mockResolvedValue({ isConnected: true });
       mockedFreighter.getAddress.mockResolvedValue({ address: PUBLIC_KEY });
 
-      render(
+      await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
@@ -393,14 +415,16 @@ describe('WalletContext', () => {
 
   describe('localStorage persistence', () => {
     it('should persist and restore connection across remounts when Freighter still exposes the same address', async () => {
-      const { unmount } = render(
+      const { unmount } = await renderWallet(
         <WalletProvider>
           <TestComponent />
         </WalletProvider>
       );
 
       await waitFor(() => expect(screen.getByTestId('is-loading')).toHaveTextContent('Ready'));
-      fireEvent.click(screen.getByTestId('connect-btn'));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('connect-btn'));
+      });
 
       await waitFor(async () => expect(await getSessionItem(STORAGE_KEY)).toBe(PUBLIC_KEY));
       await waitFor(() => expect(getSessionItem(STORAGE_KEY)).resolves.toBe(PUBLIC_KEY));

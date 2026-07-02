@@ -84,7 +84,9 @@ describe('WalletContext multi-provider support', () => {
 
     await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('ready'));
 
-    fireEvent.click(screen.getByTestId('connect-btn'));
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('connect-btn'));
+    });
 
     await waitFor(() => expect(screen.getByTestId('pk')).toHaveTextContent(RABET_KEY));
     expect(screen.getByTestId('provider')).toHaveTextContent('rabet');
