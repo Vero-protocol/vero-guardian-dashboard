@@ -106,7 +106,11 @@ export async function savePushSubscription(subscription: PushSubscription): Prom
 
   const serialized = JSON.stringify(subscription);
   const encrypted = await encryptData(serialized);
-  localStorage.setItem(STORAGE_KEY, encrypted);
+  try {
+    localStorage.setItem(STORAGE_KEY, encrypted);
+  } catch {
+    // Ignore storage failures in private or disabled-storage contexts.
+  }
 }
 
 export async function getPushSubscription(): Promise<PushSubscription | null> {
@@ -114,7 +118,12 @@ export async function getPushSubscription(): Promise<PushSubscription | null> {
     return null;
   }
 
-  const encrypted = localStorage.getItem(STORAGE_KEY);
+  let encrypted: string | null = null;
+  try {
+    encrypted = localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
   if (!encrypted) {
     return null;
   }
@@ -123,7 +132,11 @@ export async function getPushSubscription(): Promise<PushSubscription | null> {
     const decrypted = await decryptData(encrypted);
     return JSON.parse(decrypted) as PushSubscription;
   } catch {
-    localStorage.removeItem(STORAGE_KEY);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // Ignore cleanup failures.
+    }
     return null;
   }
 }
