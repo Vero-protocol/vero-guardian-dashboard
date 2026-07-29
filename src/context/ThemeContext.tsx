@@ -28,9 +28,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // On mount: read persisted preference from localStorage.
   useEffect(() => {
-    const saved = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-    if (saved === 'light' || saved === 'dark' || saved === 'system') {
-      setThemeState(saved);
+    try {
+      const saved = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
+      if (saved === 'light' || saved === 'dark' || saved === 'system') {
+        setThemeState(saved);
+      }
+    } catch {
+      // Ignore unavailable localStorage and keep the system default.
     }
     setMounted(true);
   }, []);
@@ -58,7 +62,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
 
     applyTheme();
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      // Ignore unavailable localStorage; the in-memory theme still applies.
+    }
 
     // Only watch the system preference when in 'system' mode.
     if (theme === 'system') {
