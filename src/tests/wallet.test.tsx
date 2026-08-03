@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { WalletProvider, useWallet } from '@/context/WalletContext';
-import { getSessionItem } from '@/auth/session';
+import { getSessionItem, setSessionItem } from '@/auth/session';
 
 jest.mock('@/auth/session', () => {
   const store: Record<string, string> = {};
@@ -258,7 +258,7 @@ describe('WalletContext', () => {
     });
 
     it('should clear stored wallet when it differs from the current Freighter address', async () => {
-      localStorage.setItem(STORAGE_KEY, PUBLIC_KEY);
+      await setSessionItem(STORAGE_KEY, PUBLIC_KEY);
       mockedFreighter.isConnected.mockResolvedValue({ isConnected: true });
       mockedFreighter.getAddress.mockResolvedValue({ address: OTHER_PUBLIC_KEY });
 
