@@ -94,7 +94,6 @@ describe('useSocketIO', () => {
     act(() => {
       result.current.connect();
     });
-    act(() => { result.current.connect(); });
     expect(getSocket()).not.toBeNull();
   });
 
@@ -103,7 +102,6 @@ describe('useSocketIO', () => {
     act(() => {
       result.current.disconnect();
     });
-    act(() => { result.current.disconnect(); });
     expect(getSocket()).toBeNull();
   });
 
@@ -120,7 +118,6 @@ describe('useSocketIO', () => {
       if (onAnyHandler) {
         onAnyHandler('vote:cast', { prId: 42 });
       }
-      if (onAnyHandler) onAnyHandler('vote:cast', { prId: 42 });
     });
 
     expect(result.current.lastEvent).toEqual({
@@ -140,7 +137,6 @@ describe('useSocketIO', () => {
       if (onAnyHandler) {
         onAnyHandler('pr:update', { id: 42 });
       }
-      if (onAnyHandler) onAnyHandler('pr:update', { id: 42 });
     });
 
     expect(mockInvalidateChainState).toHaveBeenCalledWith(
@@ -171,14 +167,6 @@ describe('useSocketIO', () => {
     });
 
     expect(mockEmit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'reputation_change',
-        resource: 'socket.io',
-      }),
-      if (onAnyHandler) onAnyHandler('reputation:change', { score: 100 });
-    });
-
-    expect(mockEmit).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'reputation_change', resource: 'socket.io' }),
     );
   });
@@ -200,7 +188,9 @@ describe('useSocketIO', () => {
 
     const socket = getMockedSocket();
 
-    act(() => { result.current.updateToken('new-token'); });
+    act(() => {
+      result.current.updateToken('new-token');
+    });
 
     expect(socket.disconnect as jest.Mock).toHaveBeenCalled();
     expect(socket.connect as jest.Mock).toHaveBeenCalled();

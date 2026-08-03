@@ -7,6 +7,8 @@ import {
   LogOut,
   RefreshCw,
   ShieldAlert,
+  ShieldCheck,
+  ThumbsUp,
   TrendingUp,
   Wallet,
 } from 'lucide-react';
@@ -23,6 +25,8 @@ export const EVENT_TYPE_OPTIONS: EventTypeOption[] = [
   { type: 'all', labelKey: 'eventMonitor.all', icon: Timer, color: 'text-slate-600 dark:text-slate-400' },
   { type: 'vote', labelKey: 'eventMonitor.typeVote', icon: ClipboardCheck, color: 'text-indigo-600 dark:text-indigo-400' },
   { type: 'task_registered', labelKey: 'eventMonitor.typeTask', icon: ClipboardCheck, color: 'text-emerald-600 dark:text-emerald-400' },
+  { type: 'task_verified', labelKey: 'eventMonitor.typeTaskVerified', icon: ShieldCheck, color: 'text-teal-600 dark:text-teal-400' },
+  { type: 'task_completed', labelKey: 'eventMonitor.typeTaskCompleted', icon: ThumbsUp, color: 'text-emerald-600 dark:text-emerald-400' },
   { type: 'reputation_change', labelKey: 'eventMonitor.typeReputation', icon: TrendingUp, color: 'text-amber-600 dark:text-amber-400' },
   { type: 'wallet_connected', labelKey: 'eventMonitor.typeWalletConnected', icon: Wallet, color: 'text-green-600 dark:text-green-400' },
   { type: 'wallet_disconnected', labelKey: 'eventMonitor.typeWalletDisconnected', icon: LogOut, color: 'text-red-600 dark:text-red-400' },

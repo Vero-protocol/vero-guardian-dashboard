@@ -94,7 +94,7 @@ function makeId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function sanitizeEvent(input: ProtocolEventInput): ProtocolEvent {
+export function sanitizeEvent(input: ProtocolEventInput): ProtocolEvent {
   return {
     id: makeId(),
     type: sanitizeString(input.type) ?? 'unknown',
@@ -119,7 +119,7 @@ function busSubscribe(listener: BusListener): () => void {
   return () => listeners.delete(listener);
 }
 
-function busPublish(event: ProtocolEvent): void {
+export function busPublish(event: ProtocolEvent): void {
   for (const listener of listeners) {
     try { listener(event); } catch { /* isolate listener errors */ }
   }

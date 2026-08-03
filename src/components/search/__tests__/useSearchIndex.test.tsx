@@ -2,7 +2,7 @@
  * useSearchIndex Hook Tests
  */
 
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSearchIndex } from '../useSearchIndex';
 import type { ContractMetadata } from '../types';
 
@@ -69,8 +69,10 @@ describe('useSearchIndex Hook', () => {
       expect(results).toEqual([]);
     });
 
-    it('should find contracts by name', () => {
+    it('should find contracts by name', async () => {
       const { result } = renderHook(() => useSearchIndex({ initialContracts: mockContracts }));
+      // Index building is debounced (default 300ms); wait for it before searching.
+      await waitFor(() => expect(result.current.index).not.toBeNull());
       const results = result.current.search('task');
       expect(results.length).toBeGreaterThan(0);
     });
@@ -120,13 +122,15 @@ describe('useSearchIndex Hook', () => {
       expect(result.current.contracts).toHaveLength(2);
     });
 
-    it('should enable search after adding contracts', () => {
+    it('should enable search after adding contracts', async () => {
       const { result } = renderHook(() => useSearchIndex());
 
       act(() => {
         result.current.addContracts(mockContracts);
       });
 
+      // Index building is debounced (default 300ms); wait for it before searching.
+      await waitFor(() => expect(result.current.index).not.toBeNull());
       const results = result.current.search('task');
       expect(results.length).toBeGreaterThan(0);
     });

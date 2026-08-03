@@ -117,15 +117,19 @@ describe('Fuzzy Search', () => {
   });
 
   describe('positionWeightedMatch', () => {
+    // Uses a partial query ('tes') rather than an exact token match: an
+    // exact match already scores the maximum 100 from tokenSimilarity, which
+    // leaves the positional boost multiplier no headroom to show a
+    // difference once it's clamped back down to 100.
     it('should boost matches at beginning', () => {
-      const score1 = positionWeightedMatch('test', 'test case');
-      const score2 = positionWeightedMatch('test', 'something test');
+      const score1 = positionWeightedMatch('tes', 'test case');
+      const score2 = positionWeightedMatch('tes', 'something test');
       expect(score1).toBeGreaterThan(score2);
     });
 
     it('should boost early matches', () => {
-      const score1 = positionWeightedMatch('test', 'test case more');
-      const score2 = positionWeightedMatch('test', 'case test more');
+      const score1 = positionWeightedMatch('tes', 'test case more');
+      const score2 = positionWeightedMatch('tes', 'case test more');
       expect(score1).toBeGreaterThan(score2);
     });
   });
@@ -155,9 +159,12 @@ describe('Fuzzy Search', () => {
     });
 
     it('should apply custom weights', () => {
+      // name and description must differ in match quality, otherwise a
+      // weighted average of two identical scores is the same regardless of
+      // how the weight is distributed between them.
       const fields = {
         name: 'test',
-        description: 'test',
+        description: 'unrelated content',
       };
       const score1 = multiFieldFuzzyMatch('test', fields, { name: 1.0, description: 3.0 });
       const score2 = multiFieldFuzzyMatch('test', fields, { name: 3.0, description: 1.0 });

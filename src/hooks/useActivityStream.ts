@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-import { useEvents } from '@/hooks/useEvents';
+import { useEvents, type ProtocolEvent } from '@/hooks/useEvents';
 import { appendAuditEvent } from '@/utils/logger';
 
 type Listener = () => void;
@@ -46,7 +46,7 @@ export function useActivityStream(options: UseActivityStreamOptions = {}): void 
     // timeline is newest-first; process any events we haven't seen yet in
     // chronological order.
     const lastSeenId = lastSeenRef.current;
-    const newEvents = [] as typeof timeline;
+    const newEvents: ProtocolEvent[] = [];
     for (let i = timeline.length - 1; i >= 0; i--) {
       const ev = timeline[i];
       if (lastSeenId && ev.id === lastSeenId) break;

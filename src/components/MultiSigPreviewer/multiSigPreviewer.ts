@@ -28,7 +28,7 @@ export interface SignerThreshold {
 }
 
 export interface SorobanServer {
-  simulateTransaction(tx: StellarSdk.Transaction): Promise<Record<string, unknown>>;
+  simulateTransaction(tx: StellarSdk.Transaction): Promise<unknown>;
 }
 
 /** Decode an unsigned XDR envelope and extract proposal metadata. */
@@ -85,7 +85,7 @@ export async function simulateProposal(
     const server: SorobanServer = serverFactory
       ? serverFactory(sorobanRpcUrl)
       : new StellarSdk.SorobanRpc.Server(sorobanRpcUrl);
-    const result = await server.simulateTransaction(tx);
+    const result = (await server.simulateTransaction(tx)) as Record<string, unknown>;
     if (result['error']) {
       return { success: false, fee: tx.fee, error: String(result['error']) };
     }

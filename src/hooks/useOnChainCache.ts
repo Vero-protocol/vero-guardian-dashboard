@@ -119,7 +119,6 @@ export function useOnChainCache<T>(
 
   // Read version purely to force reactive re-renders; the actual value is
   // consumed from the module-level entry below.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   void cacheVersion;
 
   const revalidate = useCallback(async (): Promise<T | undefined> => {

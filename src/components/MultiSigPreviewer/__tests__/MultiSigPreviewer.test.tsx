@@ -1,6 +1,5 @@
 import * as StellarSdk from '@stellar/stellar-sdk';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, jest } from '@jest/globals';
 import { MultiSigPreviewer } from '../MultiSigPreviewer';
 import {
   computeThreshold,
@@ -31,11 +30,11 @@ function buildTestXdr(): string {
 const VALID_XDR = buildTestXdr();
 
 function makeServer(result: Record<string, unknown>): (url: string) => SorobanServer {
-  return () => ({ simulateTransaction: jest.fn<() => Promise<Record<string, unknown>>>().mockResolvedValue(result) });
+  return () => ({ simulateTransaction: jest.fn().mockResolvedValue(result) });
 }
 
 function makeErrorServer(error: Error): (url: string) => SorobanServer {
-  return () => ({ simulateTransaction: jest.fn<() => Promise<never>>().mockRejectedValue(error) });
+  return () => ({ simulateTransaction: jest.fn().mockRejectedValue(error) });
 }
 
 // ---------------------------------------------------------------------------

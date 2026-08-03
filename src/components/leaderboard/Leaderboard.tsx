@@ -97,7 +97,7 @@ function mapEventsToContributors(events: AuditLogEvent[]): AuditContributorInput
         c.acceptedFindings += 1;
         break;
       case 'dispute_vote':
-        c.disputedFindings += 1;
+        c.disputedFindings = (c.disputedFindings ?? 0) + 1;
         break;
       default:
         // If the event looks like a finding by metadata, try to coerce it

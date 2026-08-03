@@ -39,7 +39,7 @@ export function GlobalSearchPanel({
 }: GlobalSearchPanelProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<ContractMetadata['type'][]>([]);
 
   const { search, addContracts, contracts: indexedContracts, error, isLoading: isIndexLoading } = useSearchIndex({
     initialContracts: contracts,
@@ -78,7 +78,7 @@ export function GlobalSearchPanel({
   }, [indexedContracts]);
 
   // Toggle type filter
-  const toggleTypeFilter = (type: string) => {
+  const toggleTypeFilter = (type: ContractMetadata['type']) => {
     setSelectedTypes((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]));
   };
 

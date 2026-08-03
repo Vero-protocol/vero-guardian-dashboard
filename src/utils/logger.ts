@@ -459,9 +459,9 @@ async function decryptRecord(
   const iv = base64ToBytes(record.iv);
   const ciphertext = base64ToBytes(record.ciphertext);
   const decrypted = await cryptoProvider.subtle.decrypt(
-    { name: 'AES-GCM', iv },
+    { name: 'AES-GCM', iv: iv as BufferSource },
     key,
-    ciphertext,
+    ciphertext as BufferSource,
   );
   const parsed = JSON.parse(new TextDecoder().decode(decrypted)) as unknown;
 

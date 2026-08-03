@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, jest, afterEach, beforeEach } from '@jest/globals';
 import AuditSessionTimer from '../AuditSessionTimer';
 import {
   formatDuration,

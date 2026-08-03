@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 
 import TaskCard, { matchesFilter, type TaskCardTask } from '@/components/TaskCard';
+import { resetChainStateForTests } from '@/hooks/useChainState';
 import { ToastProvider } from '@/components/Toast';
 
 let _searchParams = new URLSearchParams();
@@ -66,6 +67,10 @@ describe('matchesFilter', () => {
 });
 
 describe('TaskCard', () => {
+  afterEach(() => {
+    act(() => resetChainStateForTests());
+  });
+
   beforeEach(() => {
     _searchParams = new URLSearchParams();
   });
@@ -76,7 +81,7 @@ describe('TaskCard', () => {
     expect(screen.getByText('Review validator evidence')).toBeInTheDocument();
     expect(screen.getByText('25 VERO')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /verify quality for review validator evidence/i })
+      screen.getByRole('button', { name: /verify quality for review validator evidence/i }),
     ).toBeInTheDocument();
   });
 
@@ -169,6 +174,36 @@ describe('TaskCard', () => {
     expect(screen.getByText(/verification failed/i)).toBeInTheDocument();
   });
 
+  it('sorts completed tasks to the bottom', () => {
+    const tasks: TaskCardTask[] = [
+      createTask({
+        id: 'a',
+        title: 'Alpha pending',
+        status: 'pending',
+        is_done: false,
+      }),
+      createTask({
+        id: 'b',
+        title: 'Bravo completed',
+        status: 'completed',
+        is_done: true,
+      }),
+      createTask({
+        id: 'c',
+        title: 'Charlie in-progress',
+        status: 'in-progress',
+        is_done: false,
+      }),
+    ];
+
+    render(<TaskCard tasks={tasks} />, { wrapper: Wrapper });
+
+    const cards = screen.getAllByText(/Alpha|Bravo|Charlie/);
+    expect(cards[0]).toHaveTextContent('Charlie');
+    expect(cards[1]).toHaveTextContent('Alpha');
+    expect(cards[2]).toHaveTextContent('Bravo');
+  });
+
   it('renders filter controls', () => {
     render(<TaskCard tasks={[]} />, { wrapper: Wrapper });
 
@@ -189,7 +224,7 @@ describe('TaskCard', () => {
     expect(screen.getByText('Completed task')).toBeInTheDocument();
 
     _searchParams = new URLSearchParams();
-    rerender(<TaskCard tasks={tasks} />, { wrapper: Wrapper });
+    rerender(<TaskCard tasks={tasks} />);
     expect(screen.getByText('Pending task')).toBeInTheDocument();
   });
 

@@ -131,7 +131,7 @@ export default function VoteProgressBar({
               dataKey="count"
               position="insideRight"
               style={{ fill: '#fff', fontSize: 11, fontWeight: 600 }}
-              formatter={(v: number) => (v > 0 ? v : '')}
+              formatter={(v: unknown) => (typeof v === 'number' && v > 0 ? v : '')}
             />
           </Bar>
         </BarChart>

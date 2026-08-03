@@ -1,10 +1,13 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
-import { CheckCircle2, Clock, AlertCircle, Shield, Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { CheckCircle2, Clock, AlertCircle, Shield, ShieldCheck, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import TaskFilters from './TaskFilters';
+import { useEvents } from '@/hooks/useEvents';
+import { useTaskChainEvents } from '@/hooks/useTaskChainEvents';
+import { useChainState } from '@/hooks/useChainState';
 import { useTaskFilters } from '@/hooks/useTaskFilters';
+import TaskFilters from './TaskFilters';
 import { useToast } from '@/components/Toast';
 
 export interface TaskCardTask {
@@ -20,6 +23,8 @@ export interface TaskCardTask {
 
 interface TaskCardProps {
   tasks?: TaskCardTask[];
+  pollIntervalMs?: number;
+  /** Override the simulated Soroban submit for testing. */
   submitVote?: (taskId: string) => Promise<{ status: string; txHash?: string }>;
 }
 
@@ -73,6 +78,13 @@ const mockTasks: TaskCardTask[] = [
   },
 ];
 
+function statusSortWeight(task: TaskCardTask): number {
+  const s = task.is_done ? 'completed' : task.status;
+  if (s === 'completed') return 3;
+  if (s === 'in-progress') return 1;
+  return 2;
+}
+
 function delay(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
@@ -92,18 +104,67 @@ export function matchesFilter(task: TaskCardTask, status: string, priority: stri
   return true;
 }
 
-export default function TaskCard({ tasks = mockTasks, submitVote = defaultSubmitVote }: TaskCardProps) {
+export default function TaskCard({
+  tasks: initialTasks = mockTasks,
+  pollIntervalMs,
+  submitVote = defaultSubmitVote,
+}: TaskCardProps) {
   const { t } = useTranslation();
+  const { emit } = useEvents();
+  const { forceSync } = useChainState({ cacheKey: 'tasks' });
+  const { lastEvent } = useTaskChainEvents({ intervalMs: pollIntervalMs });
   const { filters } = useTaskFilters();
   const { showToast } = useToast();
 
+  const [taskList, setTaskList] = useState<TaskCardTask[]>(initialTasks);
+  const [animatingId, setAnimatingId] = useState<string | null>(null);
   const [pendingVotes, setPendingVotes] = useState<Record<string, boolean>>({});
   const [optimisticVotes, setOptimisticVotes] = useState<Record<string, number>>({});
   const [optimisticStatus, setOptimisticStatus] = useState<Record<string, TaskCardTask['status']>>({});
 
+  useEffect(() => {
+    if (initialTasks !== mockTasks) {
+      setTaskList(initialTasks);
+    }
+  }, [initialTasks]);
+
+  // Auto-verify: when the chain-event poller reports a task was verified
+  // on-chain, mark it completed locally and pulse a completion animation.
+  useEffect(() => {
+    if (!lastEvent) return;
+    const { taskId, taskTitle } = lastEvent;
+
+    setTaskList((prev) => {
+      const existing = prev.find((task) => task.id === taskId);
+      if (!existing || existing.is_done || existing.status === 'completed') return prev;
+      return prev.map((task) =>
+        task.id === taskId ? { ...task, status: 'completed', is_done: true } : task,
+      );
+    });
+
+    setAnimatingId(taskId);
+    const timer = setTimeout(() => setAnimatingId(null), 600);
+
+    emit({
+      type: 'task_verified',
+      actor: 'system',
+      resource: taskTitle,
+      resourceId: taskId,
+      metadata: { taskId },
+    });
+    forceSync(['tasks', `task:${taskId}`]);
+
+    return () => clearTimeout(timer);
+  }, [lastEvent, emit, forceSync]);
+
   const filteredTasks = useMemo(
-    () => tasks.filter((task) => matchesFilter(task, filters.status, filters.priority)),
-    [tasks, filters.status, filters.priority],
+    () => taskList.filter((task) => matchesFilter(task, filters.status, filters.priority)),
+    [taskList, filters.status, filters.priority],
+  );
+
+  const sortedTasks = useMemo(
+    () => [...filteredTasks].sort((a, b) => statusSortWeight(a) - statusSortWeight(b)),
+    [filteredTasks],
   );
 
   const handleVerify = useCallback(
@@ -112,7 +173,6 @@ export default function TaskCard({ tasks = mockTasks, submitVote = defaultSubmit
       if (pendingVotes[taskId]) return;
 
       const prevStatus = optimisticStatus[taskId] ?? task.status;
-      const prevVotes = task.votes ?? 0;
       const optimisticDelta = optimisticVotes[taskId] ?? 0;
 
       setPendingVotes((p) => ({ ...p, [taskId]: true }));
@@ -146,7 +206,10 @@ export default function TaskCard({ tasks = mockTasks, submitVote = defaultSubmit
     [pendingVotes, optimisticVotes, optimisticStatus, submitVote, showToast, t],
   );
 
-  const getStatusIcon = (status: TaskCardTask['status']) => {
+  const getStatusIcon = (status: TaskCardTask['status'], isAnimating: boolean) => {
+    if (isAnimating) {
+      return <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 animate-bounce" aria-hidden="true" />;
+    }
     switch (status) {
       case 'completed':
         return <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />;
@@ -192,22 +255,27 @@ export default function TaskCard({ tasks = mockTasks, submitVote = defaultSubmit
         </p>
       ) : (
         <div className="space-y-3">
-          {filteredTasks.map((task) => {
+          {sortedTasks.map((task) => {
             const baseStatus = task.is_done ? 'completed' : task.status;
             const status = optimisticStatus[task.id] ?? baseStatus;
             const title = task.title ?? t(task.titleKey ?? '');
             const isPending = pendingVotes[task.id] ?? false;
             const canVote = !task.is_done && status !== 'completed' && !isPending;
             const voteCount = (task.votes ?? 0) + (optimisticVotes[task.id] ?? 0);
+            const isAnimating = animatingId === task.id;
 
             return (
               <div
                 key={task.id}
-                className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-600 transition-colors shadow-sm"
+                className={`bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm transition-all duration-500 ${
+                  isAnimating
+                    ? 'border-emerald-400 dark:border-emerald-500 scale-[1.02] animate-in zoom-in-95 fade-in'
+                    : 'hover:border-slate-300 dark:hover:border-slate-600'
+                }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1 w-full">
-                    {getStatusIcon(status)}
+                    {getStatusIcon(status, isAnimating)}
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium text-slate-900 dark:text-white">{title}</h3>

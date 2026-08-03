@@ -59,7 +59,11 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
 
   // Save config to local storage when it changes
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(networkConfig));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(networkConfig));
+    } catch {
+      // Ignore storage failures, matching the load path above.
+    }
   }, [networkConfig]);
 
   const isCustomConfig = useMemo(

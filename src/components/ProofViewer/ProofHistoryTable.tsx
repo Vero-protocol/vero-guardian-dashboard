@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Download, Copy } from 'lucide-react';
-import { fetchProofHistory, type ProofRecord } from '@/services/proofService';
+import { fetchProofHistory } from '@/services/proofService';
+import type { ProofRecord } from '@/types/proof';
 import { useTranslation } from 'react-i18next';
 
 /**

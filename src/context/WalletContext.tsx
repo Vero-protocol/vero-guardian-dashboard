@@ -24,7 +24,7 @@ import {
 import { getReputation } from '@/lib/stellar-interact';
 import { useChainState } from '@/hooks/useChainState';
 import { useEvents } from '@/hooks/useEvents';
-import { getSessionItem, setSessionItem, sessionManager } from '@/auth/session';
+import { getSessionItem, removeSessionItem, setSessionItem, sessionManager } from '@/auth/session';
 
 const STORAGE_KEY = 'vero_wallet_publicKey';
 const PROVIDER_STORAGE_KEY = 'vero_wallet_provider';
@@ -102,9 +102,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   );
 
   const clearWalletState = useCallback((nextError: string | null = null) => {
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(PROVIDER_STORAGE_KEY);
-    localStorage.removeItem('vero_wallet_last_active');
+    removeSessionItem(STORAGE_KEY);
+    removeSessionItem(PROVIDER_STORAGE_KEY);
+    removeSessionItem('vero_wallet_last_active');
     setPublicKey(null);
     setActiveProvider(null);
     setReputation(0);

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { buildTourSteps, hasTourBeenSeen, markTourSeen } from './onboardingTour';
+import { buildTourSteps, hasTourBeenSeen, markTourSeen, type ShepherdButton } from './onboardingTour';
 
 interface OnboardingTourProps {
   /** Force the tour to start regardless of localStorage flag (for testing/demo). */
@@ -42,7 +42,7 @@ export function OnboardingTour({ autoStart = false, createTour }: OnboardingTour
 
       steps.forEach((step, index) => {
         const isLast = index === steps.length - 1;
-        const buttons: Shepherd.Step.StepOptionsButton[] = [];
+        const buttons: ShepherdButton[] = [];
 
         if (index > 0) {
           buttons.push({ text: t('tour.back'), action: () => tour.back(), secondary: true });

@@ -148,6 +148,8 @@ export default function DashboardGrid({
         },
       });
 
+      if (!grid) return;
+
       gridRef.current = grid;
 
       grid.on("change", () => {
