@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   computeThreshold,
+  createSigner,
   parseProposalXdr,
   simulateProposal,
   type MultiSigSigner,
@@ -25,9 +26,7 @@ export function MultiSigPreviewer({
   const { t } = useTranslation();
   const [xdr, setXdr] = useState('');
   const [requiredThreshold, setRequiredThreshold] = useState(2);
-  const [signers, setSigners] = useState<MultiSigSigner[]>([
-    { publicKey: '', weight: 1, signed: false },
-  ]);
+  const [signers, setSigners] = useState<MultiSigSigner[]>(() => [createSigner()]);
   const [proposal, setProposal] = useState<ParsedProposal | null>(null);
   const [simulation, setSimulation] = useState<SimulationResult | null>(null);
   const [threshold, setThreshold] = useState<SignerThreshold | null>(null);
@@ -41,20 +40,20 @@ export function MultiSigPreviewer({
     setParseError(null);
   }
 
-  function handleToggleSigned(index: number) {
-    const updated = signers.map((s, i) =>
-      i === index ? { ...s, signed: !s.signed } : s,
+  function handleToggleSigned(id: string) {
+    const updated = signers.map((s) =>
+      s.id === id ? { ...s, signed: !s.signed } : s,
     );
     setSigners(updated);
     setThreshold(computeThreshold(updated, requiredThreshold));
   }
 
   function handleAddSigner() {
-    setSigners((prev) => [...prev, { publicKey: '', weight: 1, signed: false }]);
+    setSigners((prev) => [...prev, createSigner()]);
   }
 
-  function handleRemoveSigner(index: number) {
-    const updated = signers.filter((_, i) => i !== index);
+  function handleRemoveSigner(id: string) {
+    const updated = signers.filter((s) => s.id !== id);
     setSigners(updated);
     setThreshold(computeThreshold(updated, requiredThreshold));
   }
@@ -128,14 +127,14 @@ export function MultiSigPreviewer({
       <div className="space-y-2">
         <p className="text-sm font-medium">{t('multiSig.signers')}</p>
         {signers.map((signer, index) => (
-          <div key={index} className="flex items-center gap-2">
+          <div key={signer.id} className="flex items-center gap-2">
             <input
               aria-label={`${t('multiSig.signerKey')} ${index + 1}`}
               type="text"
               value={signer.publicKey}
               onChange={(e) => {
-                const updated = signers.map((s, i) =>
-                  i === index ? { ...s, publicKey: e.target.value } : s,
+                const updated = signers.map((s) =>
+                  s.id === signer.id ? { ...s, publicKey: e.target.value } : s,
                 );
                 setSigners(updated);
               }}
@@ -148,8 +147,8 @@ export function MultiSigPreviewer({
               min={1}
               value={signer.weight}
               onChange={(e) => {
-                const updated = signers.map((s, i) =>
-                  i === index ? { ...s, weight: Math.max(1, Number(e.target.value)) } : s,
+                const updated = signers.map((s) =>
+                  s.id === signer.id ? { ...s, weight: Math.max(1, Number(e.target.value)) } : s,
                 );
                 setSigners(updated);
               }}
@@ -159,14 +158,14 @@ export function MultiSigPreviewer({
               <input
                 type="checkbox"
                 checked={signer.signed}
-                onChange={() => handleToggleSigned(index)}
+                onChange={() => handleToggleSigned(signer.id)}
                 aria-label={`${t('multiSig.signed')} ${index + 1}`}
               />
               {t('multiSig.signed')}
             </label>
             {signers.length > 1 && (
               <button
-                onClick={() => handleRemoveSigner(index)}
+                onClick={() => handleRemoveSigner(signer.id)}
                 aria-label={`${t('multiSig.removeSigner')} ${index + 1}`}
                 className="text-red-500 text-sm"
               >
