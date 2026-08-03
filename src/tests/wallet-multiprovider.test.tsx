@@ -11,6 +11,10 @@ jest.mock('@/auth/session', () => {
       try { localStorage.setItem(key, value); } catch {}
     }),
     getSessionItem: jest.fn(async (key: string) => store[key] ?? null),
+    removeSessionItem: jest.fn((key: string) => {
+      delete store[key];
+      try { localStorage.removeItem(key); } catch {}
+    }),
     sessionManager: {
       subscribe: jest.fn(() => jest.fn()),
       startMonitoring: jest.fn(),
