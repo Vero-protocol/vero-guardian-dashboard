@@ -9,6 +9,7 @@ import TransactionFeed, {
   type TransactionStreamHandlers,
   type TransactionStreamSubscriber,
 } from '../TransactionFeed';
+import type { AuditLogEventInput } from '@/utils/logger';
 
 jest.mock('@/hooks/useChainState', () => ({
   useChainState: () => ({
@@ -43,7 +44,7 @@ function makeRecord(overrides: Partial<HorizonTransactionRecord> = {}): HorizonT
 function createControllableSubscriber() {
   const handlersRef: { current: TransactionStreamHandlers | null } = { current: null };
   const unsubscribe = jest.fn();
-  const auditAppender = jest.fn(() => Promise.resolve());
+  const auditAppender = jest.fn((_event: AuditLogEventInput) => Promise.resolve());
   const subscribe: TransactionStreamSubscriber = (handlers) => {
     handlersRef.current = handlers;
     return unsubscribe;
