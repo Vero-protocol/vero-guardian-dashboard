@@ -21,8 +21,16 @@ interface DiffResult {
  */
 const sanitizeForComparison = (input: string): string => {
   if (!input) return '';
-  // Strip all HTML tags (including <script> and any malformed/nested variants).
-  return input.replace(/<[^>]+>/g, '').trim();
+  // Strip all HTML tags, including <script>. Re-applies the pattern until the
+  // string stops changing so nested/overlapping tags (e.g. "<<script>script>")
+  // can't survive a single pass.
+  let previous: string;
+  let sanitized = input;
+  do {
+    previous = sanitized;
+    sanitized = sanitized.replace(/<[^>]*>/g, '');
+  } while (sanitized !== previous);
+  return sanitized.trim();
 };
 
 export default function DiffEngine({
