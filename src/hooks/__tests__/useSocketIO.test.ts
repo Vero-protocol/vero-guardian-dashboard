@@ -6,20 +6,12 @@ import {
   resetSocketClientForTests,
 } from '@/services/socketClient';
 
-type MockedSocketKeys = 'on' | 'off' | 'emit' | 'disconnect' | 'connect' | 'removeAllListeners' | 'onAny';
-type MockSocket = Pick<jest.Mocked<Socket>, MockedSocketKeys> & {
 type MockedSocket = jest.Mocked<Pick<Socket, 'on' | 'off' | 'emit' | 'disconnect' | 'connect' | 'removeAllListeners'>> & {
   onAny: jest.Mock;
   connected: boolean;
   auth: Record<string, unknown>;
 };
 
-function getMockedSocket(): MockSocket {
-  return getSocket() as unknown as MockSocket;
-}
-
-jest.mock('socket.io-client', () => {
-  const mockSocket: MockSocket = {
 function getMockedSocket(): MockedSocket {
   return getSocket() as unknown as MockedSocket;
 }
@@ -147,11 +139,6 @@ describe('useSocketIO', () => {
 
   it('invokes useEvents emit when events arrive', () => {
     const mockEmit = jest.fn();
-    mockUseEvents.mockReturnValue({
-      emit: mockEmit,
-      timeline: [],
-      clear: jest.fn(),
-    });
     mockUseEvents.mockReturnValue({ emit: mockEmit, timeline: [], clear: jest.fn() });
 
     renderHook(() => useSocketIO({ autoConnect: true }));
@@ -172,18 +159,6 @@ describe('useSocketIO', () => {
   });
 
   it('updateToken calls socket client updateAuthToken', () => {
-    const { result } = renderHook(() =>
-      useSocketIO({ autoConnect: true }),
-    );
-
-    const socket = getMockedSocket();
-
-    act(() => {
-      result.current.updateToken('new-token');
-    });
-
-    expect(socket.auth).toEqual({});
-    // Token update triggers reconnect: disconnect + connect
     const { result } = renderHook(() => useSocketIO({ autoConnect: true }));
 
     const socket = getMockedSocket();
