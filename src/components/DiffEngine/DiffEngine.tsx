@@ -21,11 +21,8 @@ interface DiffResult {
  */
 const sanitizeForComparison = (input: string): string => {
   if (!input) return '';
-  // Basic sanitization strategy: remove potentially malicious HTML tags or script injection attempts,
-  // normalize whitespace.
-  let sanitized = input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  sanitized = sanitized.replace(/<[^>]+>/g, '');
-  return sanitized.trim();
+  // Strip all HTML tags (including <script> and any malformed/nested variants).
+  return input.replace(/<[^>]+>/g, '').trim();
 };
 
 export default function DiffEngine({
