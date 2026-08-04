@@ -65,14 +65,17 @@ describe('parseProposalXdr', () => {
 
 describe('computeThreshold', () => {
   it('met=false when no signers have signed', () => {
-    const r = computeThreshold([{ publicKey: 'A', weight: 2, signed: false }], 2);
+    const r = computeThreshold([{ id: 's1', publicKey: 'A', weight: 2, signed: false }], 2);
     expect(r.met).toBe(false);
     expect(r.current).toBe(0);
   });
 
   it('met=true when cumulative weight meets threshold', () => {
     const r = computeThreshold(
-      [{ publicKey: 'A', weight: 1, signed: true }, { publicKey: 'B', weight: 1, signed: true }],
+      [
+        { id: 's1', publicKey: 'A', weight: 1, signed: true },
+        { id: 's2', publicKey: 'B', weight: 1, signed: true },
+      ],
       2,
     );
     expect(r.met).toBe(true);
@@ -81,7 +84,10 @@ describe('computeThreshold', () => {
 
   it('only counts signed entries', () => {
     const r = computeThreshold(
-      [{ publicKey: 'A', weight: 3, signed: false }, { publicKey: 'B', weight: 1, signed: true }],
+      [
+        { id: 's1', publicKey: 'A', weight: 3, signed: false },
+        { id: 's2', publicKey: 'B', weight: 1, signed: true },
+      ],
       2,
     );
     expect(r.current).toBe(1);
@@ -89,7 +95,7 @@ describe('computeThreshold', () => {
   });
 
   it('met=true when weight exceeds threshold', () => {
-    expect(computeThreshold([{ publicKey: 'A', weight: 5, signed: true }], 2).met).toBe(true);
+    expect(computeThreshold([{ id: 's1', publicKey: 'A', weight: 5, signed: true }], 2).met).toBe(true);
   });
 
   it('current=0 for empty signers', () => {
@@ -190,5 +196,16 @@ describe('MultiSigPreviewer', () => {
     const before = screen.getAllByRole('checkbox').length;
     fireEvent.click(screen.getByText(/Add signer/i));
     expect(screen.getAllByRole('checkbox').length).toBe(before + 1);
+  });
+
+  it('reuses the same DOM node for a signer after removing another', () => {
+    render(<MultiSigPreviewer />);
+    fireEvent.click(screen.getByText(/Add signer/i));
+    fireEvent.change(screen.getByLabelText(/Signer public key 2/), {
+      target: { value: 'B' },
+    });
+    const bobNode = screen.getByLabelText(/Signer public key 2/);
+    fireEvent.click(screen.getByLabelText(/Remove signer 1/));
+    expect(screen.getByLabelText(/Signer public key 1/)).toBe(bobNode);
   });
 });

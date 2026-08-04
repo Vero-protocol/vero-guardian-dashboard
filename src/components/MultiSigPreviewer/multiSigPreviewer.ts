@@ -1,9 +1,22 @@
 import * as StellarSdk from '@stellar/stellar-sdk';
 
 export interface MultiSigSigner {
+  id: string;
   publicKey: string;
   weight: number;
   signed: boolean;
+}
+
+/** Generate a stable, unique id for a signer row. */
+export function createSignerId(): string {
+  return typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+/** Create a new blank signer with a stable id. */
+export function createSigner(): MultiSigSigner {
+  return { id: createSignerId(), publicKey: '', weight: 1, signed: false };
 }
 
 export interface ParsedProposal {
