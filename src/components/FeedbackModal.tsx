@@ -9,7 +9,15 @@ type SubmissionState = 'idle' | 'submitting' | 'success' | 'error';
 const ratings = ['Excellent', 'Good', 'Needs work'];
 
 function sanitizeInput(value: string): string {
-  return value.replace(/<[^>]*>/g, '').trim();
+  // Re-apply until the string stops changing so nested/overlapping tags
+  // (e.g. "<<script>script>") can't survive a single pass.
+  let previous: string;
+  let sanitized = value;
+  do {
+    previous = sanitized;
+    sanitized = sanitized.replace(/<[^>]*>/g, '');
+  } while (sanitized !== previous);
+  return sanitized.trim();
 }
 
 export default function FeedbackModal(): ReactElement {

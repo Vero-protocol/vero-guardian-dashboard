@@ -5,12 +5,26 @@ const MAX_EMAIL_LENGTH = 120;
 const MAX_MESSAGE_LENGTH = 1200;
 const TAG_PATTERN = /<[^>]*>/g;
 
+function stripTags(value: string): string {
+  // Re-apply until the string stops changing so nested/overlapping tags
+  // (e.g. "<<script>script>") can't survive a single pass.
+  let previous: string;
+  let stripped = value;
+  do {
+    previous = stripped;
+    stripped = stripped.replace(TAG_PATTERN, '');
+  } while (stripped !== previous);
+  return stripped;
+}
+
 function sanitizeText(value: unknown, maxLength: number): string {
   if (typeof value !== 'string') {
     return '';
   }
 
-  return value.replace(TAG_PATTERN, '').trim().slice(0, maxLength);
+  // Cap input length before running the regex so pathologically long,
+  // attacker-controlled strings can't be used to run up CPU time.
+  return stripTags(value.slice(0, maxLength * 4)).trim().slice(0, maxLength);
 }
 
 function isValidEmail(email: string): boolean {

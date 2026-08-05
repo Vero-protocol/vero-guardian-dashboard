@@ -7,6 +7,16 @@ export function isValidIpfsHash(hash: string): boolean {
   return CIDv0_RE.test(hash) || CIDv1_RE.test(hash);
 }
 
+export function isValidGateway(gateway: string): boolean {
+  try {
+    const url = new URL(gateway);
+    return url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export function buildGatewayUrl(hash: string, gateway = IPFS_GATEWAY): string {
-  return `${gateway}${hash}`;
+  const safeGateway = isValidGateway(gateway) ? gateway : IPFS_GATEWAY;
+  return `${safeGateway}${hash}`;
 }

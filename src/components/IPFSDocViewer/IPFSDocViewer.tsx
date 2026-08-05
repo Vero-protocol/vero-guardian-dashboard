@@ -59,7 +59,11 @@ export function IPFSDocViewer({ initialHash = '', gateway }: IPFSDocViewerProps)
           src={docUrl}
           title={t('ipfsDocViewer.iframeTitle', { hash: activeHash })}
           className="w-full h-96 rounded border"
-          sandbox="allow-scripts allow-same-origin"
+          // allow-same-origin is intentionally omitted: combined with
+          // allow-scripts it would let framed content (an arbitrary,
+          // attacker-uploadable IPFS document) escape the sandbox and
+          // access its own origin as if unsandboxed.
+          sandbox="allow-scripts"
         />
       )}
 
