@@ -39,7 +39,14 @@ export function isFreighterAvailable(): boolean {
 /** Request access from Freighter and return the granted public key. */
 export async function requestFreighterPublicKey(): Promise<string> {
   if (typeof freighterClient.requestAccess === 'function') {
-    const access = await freighterClient.requestAccess();
+    let access;
+    try {
+      access = await freighterClient.requestAccess();
+    } catch (error) {
+      throw new Error(
+        getWalletErrorMessage(error, 'Freighter could not grant wallet access. Open Freighter and try again.')
+      );
+    }
     if (access.error) {
       throw new Error(
         getWalletErrorMessage(access.error, 'Freighter could not grant wallet access. Open Freighter and try again.')
@@ -54,7 +61,14 @@ export async function requestFreighterPublicKey(): Promise<string> {
   }
 
   if (typeof freighterClient.getPublicKey === 'function') {
-    const publicKey = await freighterClient.getPublicKey();
+    let publicKey;
+    try {
+      publicKey = await freighterClient.getPublicKey();
+    } catch (error) {
+      throw new Error(
+        getWalletErrorMessage(error, 'Freighter wallet API is unavailable')
+      );
+    }
     if (!publicKey) {
       throw new Error('Freighter did not return a wallet public key');
     }
