@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp } from '@/app/api/rate-limiter';
 import { getVaultSecretStatus } from '@/services/vault-node';
 import {
   Vault,
@@ -17,6 +18,11 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const rateLimit = checkRateLimit(getClientIp(request));
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ error: 'Too many requests.' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { action } = body;

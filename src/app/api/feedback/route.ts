@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp } from '@/app/api/rate-limiter';
 
 const MAX_NAME_LENGTH = 80;
 const MAX_EMAIL_LENGTH = 120;
@@ -36,6 +37,11 @@ function isValidEmail(email: string): boolean {
 }
 
 export async function POST(request: Request) {
+  const rateLimit = checkRateLimit(getClientIp(request));
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ error: 'Too many requests.' }, { status: 429 });
+  }
+
   try {
     const payload = await request.json();
     const feedback = {

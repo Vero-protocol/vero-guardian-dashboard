@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp } from '@/app/api/rate-limiter';
 
 const subscriptions = new Map<string, unknown>();
 
 export async function POST(request: Request) {
+  const rateLimit = checkRateLimit(getClientIp(request));
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ error: 'Too many requests.' }, { status: 429 });
+  }
+
   try {
     const { subscription } = await request.json();
 
