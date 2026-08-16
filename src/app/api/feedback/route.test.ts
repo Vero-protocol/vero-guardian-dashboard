@@ -41,5 +41,100 @@ describe('/api/feedback', () => {
     );
 
     expect(response.status).toBe(400);
+    const payload = await response.json();
+    expect(payload.error).toContain('Feedback message is required');
+  });
+
+  test('rejects payloads missing the message field', async () => {
+    const response = await POST(
+      new Request('http://localhost/api/feedback', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Ada' }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+  });
+
+  test('rejects invalid email addresses with a clear message', async () => {
+    const response = await POST(
+      new Request('http://localhost/api/feedback', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'not-an-email',
+          message: 'hello',
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    const payload = await response.json();
+    expect(payload.error).toContain('email');
+  });
+
+  test('accepts an empty email address', async () => {
+    const response = await POST(
+      new Request('http://localhost/api/feedback', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: '',
+          message: 'No contact info provided.',
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+  });
+
+  test('rejects messages exceeding the 1200 character limit', async () => {
+    const response = await POST(
+      new Request('http://localhost/api/feedback', {
+        method: 'POST',
+        body: JSON.stringify({
+          message: 'x'.repeat(1500),
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+  });
+
+  test('rejects malformed JSON payloads', async () => {
+    const response = await POST(
+      new Request('http://localhost/api/feedback', {
+        method: 'POST',
+        body: '{not valid json',
+      }),
+    );
+
+    expect(response.status).toBe(400);
+  });
+
+  test('rejects messages that are not strings', async () => {
+    const response = await POST(
+      new Request('http://localhost/api/feedback', {
+        method: 'POST',
+        body: JSON.stringify({ message: 42 }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+  });
+
+  test('trims whitespace-only sanitized names to empty string', async () => {
+    const response = await POST(
+      new Request('http://localhost/api/feedback', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: '   ',
+          email: 'ada@example.com',
+          message: 'Valid message here.',
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    const payload = await response.json();
+    expect(payload.feedback.name).toBe('');
   });
 });
