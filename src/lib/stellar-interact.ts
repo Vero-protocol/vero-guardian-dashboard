@@ -1,7 +1,6 @@
 import * as StellarSdk from '@stellar/stellar-sdk';
 
-const HORIZON_URL = process.env.NEXT_PUBLIC_HORIZON_URL ?? 'https://horizon-testnet.stellar.org';
-const server = new StellarSdk.Horizon.Server(HORIZON_URL);
+const DEFAULT_HORIZON_URL = process.env.NEXT_PUBLIC_HORIZON_URL ?? 'https://horizon-testnet.stellar.org';
 
 function decodeBase64(value: string): string {
   if (typeof atob === 'function') {
@@ -11,7 +10,9 @@ function decodeBase64(value: string): string {
 }
 
 /** Fetch Guardian reputation score from contract data entries. */
-export async function getReputation(publicKey: string): Promise<number> {
+export async function getReputation(publicKey: string, horizonUrl?: string): Promise<number> {
+  const activeUrl = horizonUrl ?? DEFAULT_HORIZON_URL;
+  const server = new StellarSdk.Horizon.Server(activeUrl);
   const account = await server.loadAccount(publicKey);
   const entry = (account.data_attr as Record<string, string>)['vero_reputation'];
   if (!entry) {

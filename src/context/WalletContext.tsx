@@ -24,6 +24,7 @@ import {
 import { getReputation } from '@/lib/stellar-interact';
 import { useChainState } from '@/hooks/useChainState';
 import { useEvents } from '@/hooks/useEvents';
+import { useNetwork } from '@/context/NetworkContext';
 import { getSessionItem, removeSessionItem, setSessionItem, sessionManager } from '@/auth/session';
 
 const STORAGE_KEY = 'vero_wallet_publicKey';
@@ -79,6 +80,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     cacheKeys: publicKey ? [`account:${publicKey}`, `reputation:${publicKey}`] : ['wallet'],
   });
   const { emit } = useEvents();
+  const { networkConfig } = useNetwork();
 
   // Detect installed wallet extensions once on the client.
   useEffect(() => {
@@ -200,7 +202,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     async function refreshReputation() {
       try {
-        const nextReputation = await getReputation(currentPublicKey);
+        const nextReputation = await getReputation(currentPublicKey, networkConfig.horizonUrl);
         if (reputationRequestIdRef.current === requestId) {
           setReputation(nextReputation);
         }
@@ -219,7 +221,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     return () => {
       reputationRequestIdRef.current += 1;
     };
-  }, [accountSyncVersion, publicKey]);
+  }, [accountSyncVersion, networkConfig.horizonUrl, publicKey]);
 
   useEffect(() => {
     const handleAccountChange = () => {
