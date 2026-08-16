@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { FeedbackSchema } from '@/app/api/schemas';
 
 const MAX_NAME_LENGTH = 80;
 const MAX_EMAIL_LENGTH = 120;
@@ -17,7 +18,7 @@ function stripTags(value: string): string {
   return stripped;
 }
 
-function sanitizeText(value: unknown, maxLength: number): string {
+function sanitizeText(value: string | undefined, maxLength: number): string {
   if (typeof value !== 'string') {
     return '';
   }
@@ -27,50 +28,48 @@ function sanitizeText(value: unknown, maxLength: number): string {
   return stripTags(value.slice(0, maxLength * 4)).trim().slice(0, maxLength);
 }
 
-function isValidEmail(email: string): boolean {
-  if (!email) {
-    return true;
-  }
-
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
 export async function POST(request: Request) {
+  let payload: unknown;
   try {
-    const payload = await request.json();
-    const feedback = {
-      name: sanitizeText(payload.name, MAX_NAME_LENGTH),
-      email: sanitizeText(payload.email, MAX_EMAIL_LENGTH),
-      rating: sanitizeText(payload.rating, 24),
-      message: sanitizeText(payload.message, MAX_MESSAGE_LENGTH),
-      page: sanitizeText(payload.page, 240),
-      submittedAt: new Date().toISOString(),
-    };
-
-    if (!feedback.message) {
-      return NextResponse.json({ error: 'Feedback message is required.' }, { status: 400 });
-    }
-
-    if (!isValidEmail(feedback.email)) {
-      return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 });
-    }
-
-    const endpoint = process.env.FEEDBACK_WEBHOOK_URL;
-
-    if (endpoint) {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(feedback),
-      });
-
-      if (!response.ok) {
-        return NextResponse.json({ error: 'Feedback submission failed.' }, { status: 502 });
-      }
-    }
-
-    return NextResponse.json({ ok: true, feedback });
-  } catch (error) {
+    payload = await request.json();
+  } catch {
     return NextResponse.json({ error: 'Invalid feedback payload.' }, { status: 400 });
   }
+
+  const parsed = FeedbackSchema.safeParse(payload);
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0];
+    return NextResponse.json({ error: firstIssue?.message ?? 'Invalid feedback payload.' }, { status: 400 });
+  }
+
+  const feedback = {
+    name: sanitizeText(parsed.data.name, MAX_NAME_LENGTH),
+    email: sanitizeText(parsed.data.email, MAX_EMAIL_LENGTH),
+    rating: sanitizeText(parsed.data.rating, 24),
+    message: sanitizeText(parsed.data.message, MAX_MESSAGE_LENGTH),
+    page: sanitizeText(parsed.data.page, 240),
+    submittedAt: new Date().toISOString(),
+  };
+
+  // A payload consisting only of markup/whitespace sanitizes to an empty
+  // message, which the schema can't catch because the raw value is non-empty.
+  if (!feedback.message) {
+    return NextResponse.json({ error: 'Feedback message is required.' }, { status: 400 });
+  }
+
+  const endpoint = process.env.FEEDBACK_WEBHOOK_URL;
+
+  if (endpoint) {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(feedback),
+    });
+
+    if (!response.ok) {
+      return NextResponse.json({ error: 'Feedback submission failed.' }, { status: 502 });
+    }
+  }
+
+  return NextResponse.json({ ok: true, feedback });
 }

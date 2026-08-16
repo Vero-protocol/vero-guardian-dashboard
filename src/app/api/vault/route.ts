@@ -6,6 +6,7 @@ import {
   createHardwareBackedProvider,
   createSoftwareProviderForTests,
 } from '@/services/vault';
+import { VaultPostSchema } from '@/app/api/schemas';
 
 export async function GET() {
   try {
@@ -17,15 +18,27 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  let body: unknown;
   try {
-    const body = await request.json();
-    const { action } = body;
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+  }
+
+  const parsed = VaultPostSchema.safeParse(body);
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0];
+    return NextResponse.json(
+      { error: firstIssue?.message ?? 'Invalid action' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const { action } = parsed.data;
 
     if (action === 'encrypt') {
-      const { secret, keyId, hardwareBacked, keyMaterial } = body;
-      if (!secret || !keyId || !keyMaterial) {
-        return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
-      }
+      const { secret, keyId, hardwareBacked, keyMaterial } = parsed.data;
 
       const store = new MemoryVaultStore();
       const provider = hardwareBacked
@@ -42,39 +55,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, record });
     }
 
-    if (action === 'verify') {
-      const { record, keyMaterial } = body;
-      if (!record || !keyMaterial) {
-        return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+    const { record, keyMaterial } = parsed.data;
+
+    const store = new MemoryVaultStore();
+    await store.set('STELLAR_SECRET_KEY', record);
+
+    const provider = record.hardwareBacked
+      ? createHardwareBackedProvider(record.keyId, async () => keyMaterial)
+      : createSoftwareProviderForTests(keyMaterial);
+
+    const vault = new Vault({
+      store,
+      keyProvider: provider,
+      allowSoftwareProvider: !record.hardwareBacked,
+    });
+
+    let verified = false;
+    let length = 0;
+    await vault.withSecret('STELLAR_SECRET_KEY', (secretBuffer) => {
+      const secretStr = secretBuffer.toString('utf8');
+      if (secretStr.startsWith('S') && secretStr.length === 56) {
+        verified = true;
+        length = secretStr.length;
       }
+    });
 
-      const store = new MemoryVaultStore();
-      await store.set('STELLAR_SECRET_KEY', record);
-
-      const provider = record.hardwareBacked
-        ? createHardwareBackedProvider(record.keyId, async () => keyMaterial)
-        : createSoftwareProviderForTests(keyMaterial);
-
-      const vault = new Vault({
-        store,
-        keyProvider: provider,
-        allowSoftwareProvider: !record.hardwareBacked,
-      });
-
-      let verified = false;
-      let length = 0;
-      await vault.withSecret('STELLAR_SECRET_KEY', (secretBuffer) => {
-        const secretStr = secretBuffer.toString('utf8');
-        if (secretStr.startsWith('S') && secretStr.length === 56) {
-          verified = true;
-          length = secretStr.length;
-        }
-      });
-
-      return NextResponse.json({ success: verified, length });
-    }
-
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ success: verified, length });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
