@@ -34,6 +34,7 @@ Guardians connect their [Freighter](https://www.freighter.app/) wallet, browse t
 - [API Reference](#api-reference)
 - [Testing](#testing)
 - [CI/CD Pipeline](#cicd-pipeline)
+- [Security Policy](#security-policy)
 - [Deployment Checklist](#deployment-checklist)
 
 ---
@@ -833,6 +834,10 @@ Install — npm ci for reproducible installs
 Type check — tsc --noEmit catches TypeScript errors without emitting files
 Test — Jest runs all unit and component tests with coverage
 Build — next build validates the production bundle
+
+## Security Policy
+
+Please review [SECURITY.md](SECURITY.md) for details on supported versions, our coordinated disclosure policy, and how to report vulnerabilities responsibly.
 Deployment Checklist
 Before going to mainnet:
 
