@@ -395,6 +395,18 @@
     "placeholder": "Pegue el JSON del escaner, por ejemplo {\"findings\":...}",
     "criticalAlert": "Los hallazgos criticos requieren revision inmediata antes de aprobar o implementar."
   },
+  "proofs": {
+    "heading": "Historial de envio de pruebas",
+    "loading": "Cargando historial de pruebas…",
+    "error": "Error al cargar el historial: {{message}}",
+    "failedLoad": "Error al cargar el historial de pruebas",
+    "timestamp": "Marca de tiempo",
+    "taskId": "ID de tarea",
+    "proofHash": "Hash de prueba",
+    "actions": "Acciones",
+    "copyHash": "Copiar hash de prueba",
+    "download": "Descargar prueba"
+  },
   "globalStateSearch": {
     "heading": "Busqueda de estado global",
     "searchSrLabel": "Buscar objetivos de estado on-chain",

@@ -395,6 +395,18 @@
     "placeholder": "Collez le JSON du scanner, par exemple {\"findings\":...}",
     "criticalAlert": "Les decouvertes critiques necessitent un examen immediat avant approbation ou deploiement."
   },
+  "proofs": {
+    "heading": "Historique des soumissions de preuves",
+    "loading": "Chargement de l historique des preuves…",
+    "error": "Echec du chargement de l historique : {{message}}",
+    "failedLoad": "Echec du chargement de l historique des preuves",
+    "timestamp": "Horodatage",
+    "taskId": "ID de tache",
+    "proofHash": "Hash de preuve",
+    "actions": "Actions",
+    "copyHash": "Copier le hash de preuve",
+    "download": "Telecharger la preuve"
+  },
   "globalStateSearch": {
     "heading": "Recherche d etat global",
     "searchSrLabel": "Rechercher des cibles d etat on-chain",
