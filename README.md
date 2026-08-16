@@ -35,6 +35,7 @@ Guardians connect their [Freighter](https://www.freighter.app/) wallet, browse t
 - [Testing](#testing)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Deployment Checklist](#deployment-checklist)
+- [License](#license)
 
 ---
 
@@ -858,6 +859,6 @@ Enable HTTPS — Freighter requires a secure context (https://)
 
 [x] Add CSP headers allowing Stellar Horizon and Soroban RPC origins — configured in next.config.mjs (headers()), connect-src derived from NEXT_PUBLIC_HORIZON_URL / NEXT_PUBLIC_SOROBAN_RPC_URL
 
-Configure GitHub webhook secret and validate X-Hub-Signature-256 in the relayer
+## License
 
-Rate-limit the /github-webhook endpoint
+This project is open-source and available under the [MIT License](LICENSE).
