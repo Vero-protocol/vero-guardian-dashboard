@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, type ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowDown, ArrowUp, CheckCircle2, Layers, Loader2, Plus, Send, Trash2 } from 'lucide-react';
 import { useWallet } from '@/context/WalletContext';
 import {
@@ -356,7 +357,7 @@ export default function BatchTxBuilder({
       <div className="mt-5">
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-            Queued operations ({operations.length})
+            {t('batchTxBuilder.queuedOperations', 'Queued operations ({{count}})', { count: operations.length })}
           </h4>
           {operations.length > 0 && (
             <button
@@ -365,14 +366,14 @@ export default function BatchTxBuilder({
               onClick={clearAll}
               className="text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors focus:outline-none focus:underline"
             >
-              Clear all
+              {t('batchTxBuilder.clearAll', 'Clear all')}
             </button>
           )}
         </div>
 
         {operations.length === 0 ? (
           <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">
-            No operations queued yet. Add one above to start your batch.
+            {t('batchTxBuilder.noOperationsQueued', 'No operations queued yet. Add one above to start your batch.')}
           </p>
         ) : (
           <ol className="space-y-2">
@@ -390,7 +391,7 @@ export default function BatchTxBuilder({
                 </span>
                 <button
                   type="button"
-                  aria-label="Move operation up"
+                  aria-label={t('batchTxBuilder.moveOperationUp', 'Move operation up')}
                   onClick={() => move(index, 'up')}
                   disabled={index === 0}
                   className="p-1 rounded text-slate-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -399,7 +400,7 @@ export default function BatchTxBuilder({
                 </button>
                 <button
                   type="button"
-                  aria-label="Move operation down"
+                  aria-label={t('batchTxBuilder.moveOperationDown', 'Move operation down')}
                   onClick={() => move(index, 'down')}
                   disabled={index === operations.length - 1}
                   className="p-1 rounded text-slate-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"

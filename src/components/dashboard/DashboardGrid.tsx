@@ -201,7 +201,7 @@ export default function DashboardGrid({
           className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <RefreshCw className="w-4 h-4" />
-          <span>Reset Layout</span>
+          <span>{t('dashboard.resetLayout', 'Reset Layout')}</span>
         </button>
       </div>
 

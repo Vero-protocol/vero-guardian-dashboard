@@ -1,6 +1,7 @@
 'use client';
 
 import { X, AlertTriangle, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAlerts, type AlertType } from '@/context/AlertContext';
 
 const TYPE_PRIORITY: Record<AlertType, number> = {
@@ -29,6 +30,7 @@ function AlertIcon({ type }: { type: AlertType }) {
 
 export function AlertBanner() {
   const { alerts, dismissAlert } = useAlerts();
+  const { t } = useTranslation();
 
   const active = alerts.length === 0
     ? null
@@ -56,7 +58,7 @@ export function AlertBanner() {
       {active.dismissable && (
         <button
           onClick={() => dismissAlert(active.id)}
-          aria-label="Dismiss alert"
+          aria-label={t('alertBanner.dismissAlert', 'Dismiss alert')}
           className="shrink-0 opacity-70 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded p-0.5"
         >
           <X className="w-4 h-4" aria-hidden="true" />

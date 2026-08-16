@@ -13,7 +13,7 @@
   },
   "app": {
     "networkName": "Reseau de validation decentralise",
-    "footerCopyright": "© 2026 Vero Guardian. Tous droits reserves.",
+    "footerCopyright": "\u00a9 2026 Vero Guardian. Tous droits reserves.",
     "footerNavigation": "Navigation du pied de page"
   },
   "language": {
@@ -65,7 +65,7 @@
   "emergencyHalt": {
     "label": "Arret d urgence",
     "halted": "Contrat interrompu",
-    "halting": "Interruption du contrat…",
+    "halting": "Interruption du contrat\u2026",
     "noContract": "Contrat non configure",
     "missingWallet": "Connectez d abord le portefeuille",
     "unauthorized": "Administrateur seulement",
@@ -126,9 +126,9 @@
     },
     "verify": {
       "action": "Verifier la qualite",
-      "pending": "Verification…",
+      "pending": "Verification\u2026",
       "toast": {
-        "success": "Verifie! Tx {{txHash}}…",
+        "success": "Verifie! Tx {{txHash}}\u2026",
         "error": "Echec de la verification. Modifications annulees."
       }
     },
@@ -155,7 +155,7 @@
       "failed": "Echec du vote"
     },
     "tx": {
-      "pending": "En attente de la signature Freighter…",
+      "pending": "En attente de la signature Freighter\u2026",
       "success": "Vote enregistre sur la chaine.",
       "viewTx": "Voir la transaction",
       "errorUserRejected": "Signature refusee. Ouvrez Freighter et reessayez.",
@@ -365,7 +365,7 @@
     "auditActivity": "Activite d audit",
     "title": "Classement",
     "all": "Tout",
-    "refresh": "Rafraîchir",
+    "refresh": "Rafra\u00eechir",
     "refreshing": "Actualisation...",
     "recent30d": "30j",
     "audits": "Audits",
@@ -380,12 +380,12 @@
   "auditExport": {
     "heading": "Exportation des Journaux d'Audit",
     "exportBtn": "Exporter en CSV",
-    "exporting": "Décryptage et formatage des enregistrements...",
-    "count_one": "{{count}} événement historique enregistré",
-    "count_other": "{{count}} événements historiques enregistrés",
-    "safetyInfo": "Données assainies contre l'injection de formules",
-    "empty": "Aucun journal d'audit historique trouvé.",
-    "error": "Échec du décryptage des journaux d'audit: {{message}}"
+    "exporting": "D\u00e9cryptage et formatage des enregistrements...",
+    "count_one": "{{count}} \u00e9v\u00e9nement historique enregistr\u00e9",
+    "count_other": "{{count}} \u00e9v\u00e9nements historiques enregistr\u00e9s",
+    "safetyInfo": "Donn\u00e9es assainies contre l'injection de formules",
+    "empty": "Aucun journal d'audit historique trouv\u00e9.",
+    "error": "\u00c9chec du d\u00e9cryptage des journaux d'audit: {{message}}"
   },
   "securityScanner": {
     "heading": "Resultats du scanner de securite",
@@ -503,17 +503,17 @@
   "multiSig": {
     "heading": "Apercu de proposition multi-signature",
     "xdrLabel": "XDR de transaction",
-    "xdrPlaceholder": "Collez le XDR de transaction non signe…",
+    "xdrPlaceholder": "Collez le XDR de transaction non signe\u2026",
     "threshold": "Seuil de poids requis",
     "signers": "Signataires",
     "signerKey": "Cle publique du signataire",
-    "signerPlaceholder": "Cle publique G…",
+    "signerPlaceholder": "Cle publique G\u2026",
     "weight": "Poids",
     "signed": "Signe",
     "addSigner": "Ajouter signataire",
     "removeSigner": "Supprimer signataire",
     "preview": "Apercu et simuler",
-    "simulating": "Simulation…",
+    "simulating": "Simulation\u2026",
     "source": "Compte source",
     "fee": "Frais",
     "operations": "Operations",
@@ -522,5 +522,30 @@
     "thresholdNotMet": "Seuil non atteint",
     "simSuccess": "Simulation reussie",
     "simError": "Echec de simulation"
+  },
+  "batchTxBuilder": {
+    "queuedOperations": "Operations en file d'attente ({{count}})",
+    "clearAll": "Tout effacer",
+    "noOperationsQueued": "Aucune op\u00e9ration en file d'attente. Ajoutez-en une ci-dessus pour commencer votre lot.",
+    "moveOperationUp": "D\u00e9placer l'op\u00e9ration vers le haut",
+    "moveOperationDown": "D\u00e9placer l'op\u00e9ration vers le bas",
+    "maxOperations": "Une transaction peut contenir au maximum {{max}} op\u00e9rations."
+  },
+  "search": {
+    "searching": "Recherche...",
+    "noSearchQuery": "Aucune requ\u00eate de recherche",
+    "noResultsFound": "Aucun r\u00e9sultat trouv\u00e9",
+    "enterSearchTerm": "Entrez un terme de recherche pour trouver des contrats et fonctions",
+    "tryDifferentKeywords": "Essayez diff\u00e9rents mots-cl\u00e9s ou v\u00e9rifiez l'orthographe",
+    "searchResults": "R\u00e9sultats de recherche",
+    "functionLabel": "Fonction :",
+    "matchLabel": "Correspondance :",
+    "placeholder": "Rechercher des contrats, fonctions ou donn\u00e9es on-chain..."
+  },
+  "alertBanner": {
+    "dismissAlert": "Fermer l'alerte"
+  },
+  "dashboard": {
+    "resetLayout": "R\u00e9initialiser la disposition"
   }
 }

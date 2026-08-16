@@ -13,7 +13,7 @@
   },
   "app": {
     "networkName": "Red de validacion descentralizada",
-    "footerCopyright": "© 2026 Vero Guardian. Todos los derechos reservados.",
+    "footerCopyright": "\u00a9 2026 Vero Guardian. Todos los derechos reservados.",
     "footerNavigation": "Navegacion del pie de pagina"
   },
   "language": {
@@ -65,7 +65,7 @@
   "emergencyHalt": {
     "label": "Parada de emergencia",
     "halted": "Contrato detenido",
-    "halting": "Deteniendo contrato…",
+    "halting": "Deteniendo contrato\u2026",
     "noContract": "Contrato no configurado",
     "missingWallet": "Conecta la cartera primero",
     "unauthorized": "Solo administradores",
@@ -126,9 +126,9 @@
     },
     "verify": {
       "action": "Verificar calidad",
-      "pending": "Verificando…",
+      "pending": "Verificando\u2026",
       "toast": {
-        "success": "Verificado! Tx {{txHash}}…",
+        "success": "Verificado! Tx {{txHash}}\u2026",
         "error": "Verificacion fallida. Cambios revertidos."
       }
     },
@@ -155,7 +155,7 @@
       "failed": "El voto fallo"
     },
     "tx": {
-      "pending": "Esperando firma de Freighter…",
+      "pending": "Esperando firma de Freighter\u2026",
       "success": "Voto registrado en la cadena.",
       "viewTx": "Ver transaccion",
       "errorUserRejected": "Firma rechazada. Abre Freighter e intenta de nuevo.",
@@ -378,14 +378,14 @@
     "rankAria": "Puesto {{rank}}"
   },
   "auditExport": {
-    "heading": "Exportar Registro de Auditoría",
+    "heading": "Exportar Registro de Auditor\u00eda",
     "exportBtn": "Exportar a CSV",
     "exporting": "Desencriptando y formateando registros...",
-    "count_one": "{{count}} evento histórico registrado",
-    "count_other": "{{count}} eventos históricos registrados",
-    "safetyInfo": "Datos desinfectados contra inyección de fórmulas",
-    "empty": "No se encontraron registros de auditoría históricos.",
-    "error": "Error al desencriptar los registros de auditoría: {{message}}"
+    "count_one": "{{count}} evento hist\u00f3rico registrado",
+    "count_other": "{{count}} eventos hist\u00f3ricos registrados",
+    "safetyInfo": "Datos desinfectados contra inyecci\u00f3n de f\u00f3rmulas",
+    "empty": "No se encontraron registros de auditor\u00eda hist\u00f3ricos.",
+    "error": "Error al desencriptar los registros de auditor\u00eda: {{message}}"
   },
   "securityScanner": {
     "heading": "Resultados del escaner de seguridad",
@@ -503,17 +503,17 @@
   "multiSig": {
     "heading": "Vista previa de propuesta multi-firma",
     "xdrLabel": "XDR de transaccion",
-    "xdrPlaceholder": "Pega el XDR de la transaccion sin firmar…",
+    "xdrPlaceholder": "Pega el XDR de la transaccion sin firmar\u2026",
     "threshold": "Umbral de peso requerido",
     "signers": "Firmantes",
     "signerKey": "Clave publica del firmante",
-    "signerPlaceholder": "Clave publica G…",
+    "signerPlaceholder": "Clave publica G\u2026",
     "weight": "Peso",
     "signed": "Firmado",
     "addSigner": "Agregar firmante",
     "removeSigner": "Eliminar firmante",
     "preview": "Vista previa y simular",
-    "simulating": "Simulando…",
+    "simulating": "Simulando\u2026",
     "source": "Cuenta de origen",
     "fee": "Tarifa",
     "operations": "Operaciones",
@@ -522,5 +522,30 @@
     "thresholdNotMet": "Umbral no alcanzado",
     "simSuccess": "Simulacion exitosa",
     "simError": "Simulacion fallida"
+  },
+  "batchTxBuilder": {
+    "queuedOperations": "Operaciones en cola ({{count}})",
+    "clearAll": "Borrar todo",
+    "noOperationsQueued": "A\u00fan no hay operaciones en cola. Agregue una arriba para comenzar su lote.",
+    "moveOperationUp": "Mover operaci\u00f3n hacia arriba",
+    "moveOperationDown": "Mover operaci\u00f3n hacia abajo",
+    "maxOperations": "Una transacci\u00f3n puede contener como m\u00e1ximo {{max}} operaciones."
+  },
+  "search": {
+    "searching": "Buscando...",
+    "noSearchQuery": "Sin consulta de b\u00fasqueda",
+    "noResultsFound": "No se encontraron resultados",
+    "enterSearchTerm": "Ingrese un t\u00e9rmino de b\u00fasqueda para encontrar contratos y funciones",
+    "tryDifferentKeywords": "Pruebe diferentes palabras clave o revise la ortograf\u00eda",
+    "searchResults": "Resultados de b\u00fasqueda",
+    "functionLabel": "Funci\u00f3n:",
+    "matchLabel": "Coincidencia:",
+    "placeholder": "Buscar contratos, funciones o datos on-chain..."
+  },
+  "alertBanner": {
+    "dismissAlert": "Descartar alerta"
+  },
+  "dashboard": {
+    "resetLayout": "Restablecer dise\u00f1o"
   }
 }

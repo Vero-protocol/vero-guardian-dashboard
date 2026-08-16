@@ -13,7 +13,7 @@
   },
   "app": {
     "networkName": "Decentralized Validation Network",
-    "footerCopyright": "© 2026 Vero Guardian. All rights reserved.",
+    "footerCopyright": "\u00a9 2026 Vero Guardian. All rights reserved.",
     "footerNavigation": "Footer Navigation"
   },
   "language": {
@@ -65,7 +65,7 @@
   "emergencyHalt": {
     "label": "Emergency Halt",
     "halted": "Contract Halted",
-    "halting": "Halting Contract…",
+    "halting": "Halting Contract\u2026",
     "noContract": "Contract Not Configured",
     "missingWallet": "Connect Wallet First",
     "unauthorized": "Admin Only",
@@ -126,9 +126,9 @@
     },
     "verify": {
       "action": "Verify Quality",
-      "pending": "Verifying…",
+      "pending": "Verifying\u2026",
       "toast": {
-        "success": "Verified! Tx {{txHash}}…",
+        "success": "Verified! Tx {{txHash}}\u2026",
         "error": "Verification failed. Changes reverted."
       }
     },
@@ -155,7 +155,7 @@
       "failed": "Vote failed"
     },
     "tx": {
-      "pending": "Waiting for Freighter signature…",
+      "pending": "Waiting for Freighter signature\u2026",
       "success": "Vote recorded on-chain.",
       "viewTx": "View transaction",
       "errorUserRejected": "Signature rejected. Open Freighter and try again.",
@@ -503,17 +503,17 @@
   "multiSig": {
     "heading": "Multi-Sig Proposal Previewer",
     "xdrLabel": "Transaction XDR",
-    "xdrPlaceholder": "Paste unsigned transaction XDR envelope…",
+    "xdrPlaceholder": "Paste unsigned transaction XDR envelope\u2026",
     "threshold": "Required weight threshold",
     "signers": "Signers",
     "signerKey": "Signer public key",
-    "signerPlaceholder": "G… public key",
+    "signerPlaceholder": "G\u2026 public key",
     "weight": "Weight",
     "signed": "Signed",
     "addSigner": "Add signer",
     "removeSigner": "Remove signer",
     "preview": "Preview & Simulate",
-    "simulating": "Simulating…",
+    "simulating": "Simulating\u2026",
     "source": "Source account",
     "fee": "Fee",
     "operations": "Operations",
@@ -522,5 +522,30 @@
     "thresholdNotMet": "Threshold not met",
     "simSuccess": "Simulation succeeded",
     "simError": "Simulation failed"
+  },
+  "batchTxBuilder": {
+    "queuedOperations": "Queued operations ({{count}})",
+    "clearAll": "Clear all",
+    "noOperationsQueued": "No operations queued yet. Add one above to start your batch.",
+    "moveOperationUp": "Move operation up",
+    "moveOperationDown": "Move operation down",
+    "maxOperations": "A transaction can hold at most {{max}} operations."
+  },
+  "search": {
+    "searching": "Searching...",
+    "noSearchQuery": "No search query",
+    "noResultsFound": "No results found",
+    "enterSearchTerm": "Enter a search term to find contracts and functions",
+    "tryDifferentKeywords": "Try different keywords or check the spelling",
+    "searchResults": "Search results",
+    "functionLabel": "Function:",
+    "matchLabel": "Match:",
+    "placeholder": "Search contracts, functions, or on-chain data..."
+  },
+  "alertBanner": {
+    "dismissAlert": "Dismiss alert"
+  },
+  "dashboard": {
+    "resetLayout": "Reset Layout"
   }
 }

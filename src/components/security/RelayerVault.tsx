@@ -262,8 +262,7 @@ export default function RelayerVault(): ReactElement {
                   </div>
                 )}
               </div>
-            ) : (
-              {statusError ? (
+            ) : statusError ? (
                 <div className="p-3 rounded-xl border border-red-200 bg-red-50 text-red-800 dark:border-red-950/40 dark:bg-red-950/20 dark:text-red-300 text-xs space-y-2">
                   <div className="flex items-center gap-2">
                     <ShieldAlert className="h-5 w-5 shrink-0 text-red-500" />
@@ -281,7 +280,6 @@ export default function RelayerVault(): ReactElement {
                   {t('relayerVault.loadingStatus', 'Fetching vault status...')}
                 </div>
               )}
-            )}
           </div>
         )}
 

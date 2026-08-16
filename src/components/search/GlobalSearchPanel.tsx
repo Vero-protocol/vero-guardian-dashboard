@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { ChevronDown, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { SearchInput } from './SearchInput';
 import { SearchResults } from './SearchResults';
 import type { RankedSearchResult, SearchOptions } from './types';
@@ -34,10 +35,12 @@ export function GlobalSearchPanel({
   maxResults = 10,
   minScore = 20,
   debounceMs = 300,
-  placeholder = 'Search contracts, functions, or on-chain data...',
+  placeholder = '',
   storageKey = 'search-index-contracts',
 }: GlobalSearchPanelProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
+  const resolvedPlaceholder = placeholder || t('search.placeholder', 'Search contracts, functions, or on-chain data...');
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<ContractMetadata['type'][]>([]);
 
@@ -105,7 +108,7 @@ export function GlobalSearchPanel({
       <SearchInput
         value={query}
         onChange={setQuery}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         isLoading={isIndexLoading || isSearching}
         error={error}
         autoFocus

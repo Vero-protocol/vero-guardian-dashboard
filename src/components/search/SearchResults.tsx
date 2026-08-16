@@ -6,6 +6,7 @@
  */
 
 import { Badge } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { RankedSearchResult } from './types';
 
 const TYPE_STYLES: Record<string, string> = {
@@ -66,7 +67,7 @@ export function SearchResults({
     return (
       <div className="flex items-center justify-center py-8 text-sm text-slate-500 dark:text-slate-400">
         <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-500 dark:border-slate-600" />
-        <span className="ml-2">Searching...</span>
+        <span className="ml-2">{t('search.searching', 'Searching...')}</span>
       </div>
     );
   }
@@ -75,19 +76,19 @@ export function SearchResults({
     return (
       <div className="rounded-lg border border-slate-200 bg-slate-50 px-6 py-8 text-center dark:border-slate-700 dark:bg-slate-900/30">
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-          {isEmpty ? 'No search query' : 'No results found'}
+          {isEmpty ? t('search.noSearchQuery', 'No search query') : t('search.noResultsFound', 'No results found')}
         </p>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           {isEmpty
-            ? 'Enter a search term to find contracts and functions'
-            : 'Try different keywords or check the spelling'}
+            ? t('search.enterSearchTerm', 'Enter a search term to find contracts and functions')
+            : t('search.tryDifferentKeywords', 'Try different keywords or check the spelling')}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3" style={{ maxHeight, overflowY: 'auto' }} role="region" aria-label="Search results">
+    <div className="space-y-3" style={{ maxHeight, overflowY: 'auto' }} role="region" aria-label={t('search.searchResults', 'Search results')}>
       {results.map((result, idx) => (
         <button
           key={`${result.contract.id}-${result.function?.id || 'contract'}-${idx}`}
@@ -123,7 +124,7 @@ export function SearchResults({
             {result.function && (
               <div className="space-y-1 border-t border-slate-200 pt-2 dark:border-slate-700">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Function:</span>
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('search.functionLabel', 'Function:')}</span>
                   <code className="rounded bg-slate-100 px-2 py-1 text-xs font-mono text-slate-700 dark:bg-slate-700 dark:text-slate-300">
                     {result.function.name}
                   </code>
@@ -161,7 +162,7 @@ export function SearchResults({
             {/* Match type indicator */}
             <div className="flex items-center justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                Match: <span className="font-medium">{MATCH_TYPE_LABELS[result.matchType]}</span>
+                {t('search.matchLabel', 'Match:')} <span className="font-medium">{MATCH_TYPE_LABELS[result.matchType]}</span>
               </span>
             </div>
           </div>
