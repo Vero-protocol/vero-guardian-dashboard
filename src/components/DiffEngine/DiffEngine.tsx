@@ -19,7 +19,7 @@ interface DiffResult {
 /**
  * Sanitizes the string for off-chain comparison to ensure it's safe.
  */
-const sanitizeForComparison = (input: string): string => {
+export const sanitizeForComparison = (input: string): string => {
   if (!input) return '';
   // Strip all HTML tags, including <script>. Re-applies the pattern until the
   // string stops changing so nested/overlapping tags (e.g. "<<script>script>")
