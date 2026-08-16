@@ -13,11 +13,13 @@ import {
   FileJson,
   Check,
 } from 'lucide-react';
+import { useToast } from '@/components/Toast';
 import { useCallback, useEffect, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function RelayerVault(): ReactElement {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'status' | 'encrypt' | 'verify'>('status');
 
   // Vault Status State
@@ -28,6 +30,7 @@ export default function RelayerVault(): ReactElement {
     warning?: string;
   } | null>(null);
   const [isStatusLoading, setIsStatusLoading] = useState(false);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   // Encrypt Form State
   const [secret, setSecret] = useState('');
@@ -52,16 +55,20 @@ export default function RelayerVault(): ReactElement {
   // Fetch Vault Status
   const fetchStatus = useCallback(async () => {
     setIsStatusLoading(true);
+    setStatusError(null);
     try {
       const res = await fetch('/api/vault');
       if (res.ok) {
         const data = await res.json();
         setStatus(data);
+        setStatusError(null);
       } else {
-        console.error('Failed to load vault status');
+        setStatusError('Failed to load vault status');
+        showToast(t('relayerVault.statusFetchError', 'Failed to load vault status'), 'error');
       }
     } catch (err) {
-      console.error('Error fetching vault status:', err);
+      setStatusError('Failed to load vault status');
+      showToast(t('relayerVault.statusFetchError', 'Failed to load vault status'), 'error');
     } finally {
       setIsStatusLoading(false);
     }
@@ -256,9 +263,24 @@ export default function RelayerVault(): ReactElement {
                 )}
               </div>
             ) : (
-              <div className="text-sm text-slate-500 animate-pulse">
-                {t('relayerVault.loadingStatus', 'Fetching vault status...')}
-              </div>
+              {statusError ? (
+                <div className="p-3 rounded-xl border border-red-200 bg-red-50 text-red-800 dark:border-red-950/40 dark:bg-red-950/20 dark:text-red-300 text-xs space-y-2">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="h-5 w-5 shrink-0 text-red-500" />
+                    <span>{statusError}</span>
+                  </div>
+                  <button
+                    onClick={fetchStatus}
+                    className="text-xs underline hover:no-underline text-red-600 dark:text-red-400"
+                  >
+                    {t('common.retry', 'Retry')}
+                  </button>
+                </div>
+              ) : (
+                <div className="text-sm text-slate-500 animate-pulse">
+                  {t('relayerVault.loadingStatus', 'Fetching vault status...')}
+                </div>
+              )}
             )}
           </div>
         )}
