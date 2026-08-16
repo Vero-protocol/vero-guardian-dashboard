@@ -177,7 +177,7 @@ export async function haltContract(
     throw new Error(simulation.error);
   }
 
-  const preparedTx = StellarSdk.SorobanRpc.assembleTransaction(rawTx, simulation) as any;
+  const preparedTx = StellarSdk.SorobanRpc.assembleTransaction(rawTx, simulation).build();
 
   const signed = await signTransaction(preparedTx.toXDR(), {
     networkPassphrase,
