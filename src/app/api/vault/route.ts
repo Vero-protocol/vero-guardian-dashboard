@@ -7,16 +7,60 @@ import {
   createSoftwareProviderForTests,
 } from '@/services/vault';
 
-export async function GET() {
+/**
+ * Require an authorized caller before processing vault encrypt/verify.
+ * Uses VAULT_API_SECRET via Authorization: Bearer <secret>.
+ * Fail closed if the secret is not configured.
+ */
+function requireAuth(request: Request): NextResponse | null {
+  const expected = process.env.VAULT_API_SECRET;
+  if (!expected) {
+    console.error('[vault] VAULT_API_SECRET is not configured — rejecting request');
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const token = authHeader.slice('Bearer '.length).trim();
+  if (token !== expected) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  return null; // authorized
+}
+
+function genericErrorResponse(error: unknown, context: string) {
+  // Log full details server-side only — never return error.message to the client
+  console.error(`[vault] ${context}:`, error);
+  return NextResponse.json(
+    { error: 'An internal error occurred' },
+    { status: 500 },
+  );
+}
+
+export async function GET(request: Request) {
+  const unauthorized = requireAuth(request);
+  if (unauthorized) {
+    return unauthorized;
+  }
+
   try {
     const status = getVaultSecretStatus('STELLAR_SECRET_KEY');
     return NextResponse.json(status);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return genericErrorResponse(error, 'GET status failed');
   }
 }
 
 export async function POST(request: Request) {
+  const unauthorized = requireAuth(request);
+  if (unauthorized) {
+    return unauthorized;
+  }
+
   try {
     const body = await request.json();
     const { action } = body;
@@ -24,7 +68,10 @@ export async function POST(request: Request) {
     if (action === 'encrypt') {
       const { secret, keyId, hardwareBacked, keyMaterial } = body;
       if (!secret || !keyId || !keyMaterial) {
-        return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Missing required parameters' },
+          { status: 400 },
+        );
       }
 
       const store = new MemoryVaultStore();
@@ -45,7 +92,10 @@ export async function POST(request: Request) {
     if (action === 'verify') {
       const { record, keyMaterial } = body;
       if (!record || !keyMaterial) {
-        return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Missing required parameters' },
+          { status: 400 },
+        );
       }
 
       const store = new MemoryVaultStore();
@@ -75,7 +125,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return genericErrorResponse(error, 'POST failed');
   }
 }
