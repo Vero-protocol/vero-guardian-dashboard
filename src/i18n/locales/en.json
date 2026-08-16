@@ -395,6 +395,18 @@
     "placeholder": "Paste scanner JSON, for example {\"findings\":...}",
     "criticalAlert": "Critical scanner findings require immediate review before approval or deployment."
   },
+  "proofs": {
+    "heading": "Proof Submission History",
+    "loading": "Loading proof history…",
+    "error": "Failed to load proof history: {{message}}",
+    "failedLoad": "Failed to load proof history",
+    "timestamp": "Timestamp",
+    "taskId": "Task ID",
+    "proofHash": "Proof Hash",
+    "actions": "Actions",
+    "copyHash": "Copy proof hash",
+    "download": "Download proof"
+  },
   "globalStateSearch": {
     "heading": "Global State Search",
     "searchSrLabel": "Search on-chain state targets",
