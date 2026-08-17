@@ -35,6 +35,7 @@ Guardians connect their [Freighter](https://www.freighter.app/) wallet, browse t
 - [Testing](#testing)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Deployment Checklist](#deployment-checklist)
+- [Contributing](#contributing)
 
 ---
 
@@ -861,3 +862,12 @@ Enable HTTPS — Freighter requires a secure context (https://)
 Configure GitHub webhook secret and validate X-Hub-Signature-256 in the relayer
 
 Rate-limit the /github-webhook endpoint
+
+---
+
+## Contributing
+
+Contributions are welcome. See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for local
+setup, branch naming, commit conventions, the test/lint commands CI runs, and the
+requirement to link every pull request to its issue with `Closes #ISSUE_NUMBER`.
+Code style is documented in **[STYLEGUIDE.md](./STYLEGUIDE.md)**.
