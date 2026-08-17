@@ -35,6 +35,7 @@ Guardians connect their [Freighter](https://www.freighter.app/) wallet, browse t
 - [Testing](#testing)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Deployment Checklist](#deployment-checklist)
+- [License](#license)
 
 ---
 
@@ -861,3 +862,7 @@ Enable HTTPS — Freighter requires a secure context (https://)
 Configure GitHub webhook secret and validate X-Hub-Signature-256 in the relayer
 
 Rate-limit the /github-webhook endpoint
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
