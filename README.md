@@ -35,6 +35,7 @@ Guardians connect their [Freighter](https://www.freighter.app/) wallet, browse t
 - [Testing](#testing)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Deployment Checklist](#deployment-checklist)
+- [Community](#community)
 
 ---
 
@@ -861,3 +862,13 @@ Enable HTTPS — Freighter requires a secure context (https://)
 Configure GitHub webhook secret and validate X-Hub-Signature-256 in the relayer
 
 Rate-limit the /github-webhook endpoint
+
+---
+
+## Community
+
+All contributors are expected to follow the
+[Code of Conduct](CODE_OF_CONDUCT.md) — a standard set of behavioral
+expectations that keeps the Vero Guardian community open, welcoming, and
+professional. Reports of unacceptable behavior can be filed through the
+[issue tracker](https://github.com/Vero-protocol/vero-guardian-dashboard/issues).
