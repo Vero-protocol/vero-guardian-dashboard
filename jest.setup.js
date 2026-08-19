@@ -1,3 +1,6 @@
+// Set environment variable for tests
+process.env.NEXT_PUBLIC_CONTRACT_ID = '0x1234567890abcdef';
+
 import '@testing-library/jest-dom';
 import './src/i18n/config';
 import { installIndexedDBMock } from './test-utils/indexeddb-mock';

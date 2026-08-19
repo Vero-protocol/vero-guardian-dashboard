@@ -3,16 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 // Set environment variable BEFORE importing the component
 process.env.NEXT_PUBLIC_CONTRACT_ID = '0x1234567890abcdef';
 
-import EmergencyHaltButton from '@/components/EmergencyHaltButton';
-import { haltContract } from '@/services/contractClient';
-import { useRole } from '@/context/RoleContext';
-import { useToast } from '@/components/Toast';
-import { useWallet } from '@/context/WalletContext';
-import { useNetwork } from '@/context/NetworkContext';
-import { useChainState } from '@/hooks/useChainState';
-import { useEvents } from '@/hooks/useEvents';
-import { appendAuditEvent } from '@/utils/logger';
-
 // Mock i18n
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -63,7 +53,7 @@ jest.mock('@/hooks/useChainState', () => ({
   useChainState: jest.fn(() => ({ forceSync: jest.fn(), isHalted: false })),
 }));
 jest.mock('@/hooks/useEvents', () => ({
-  useEvents: jest.fn(() => ({ emit: jest.fn() })),
+  useEvents: jest.fn(() => ({ emit: jest.fn(), timeline: [], clear: jest.fn() })),
 }));
 jest.mock('@/utils/logger', () => ({
   appendAuditEvent: jest.fn(() => Promise.resolve()),
@@ -72,7 +62,16 @@ jest.mock('@/lib/stellar-expert', () => ({
   getStellarExplorerTxUrl: (hash: string) => `https://stellar.expert/explorer/testnet/tx/${hash}`,
 }));
 
+// Import after all mocks are set up
+import EmergencyHaltButton from '@/components/EmergencyHaltButton';
+import { haltContract } from '@/services/contractClient';
+import { useRole } from '@/context/RoleContext';
+import { useToast } from '@/components/Toast';
+import { useWallet } from '@/context/WalletContext';
 import { useNetwork } from '@/context/NetworkContext';
+import { useChainState } from '@/hooks/useChainState';
+import { useEvents } from '@/hooks/useEvents';
+import { appendAuditEvent } from '@/utils/logger';
 
 const mockHaltContract = haltContract as jest.MockedFunction<typeof haltContract>;
 const mockUseRole = useRole as jest.MockedFunction<typeof useRole>;
@@ -82,8 +81,10 @@ const mockUseNetwork = useNetwork as jest.MockedFunction<typeof useNetwork>;
 const mockUseEvents = useEvents as jest.MockedFunction<typeof useEvents>;
 const mockShowToast = jest.fn();
 const mockEmit = jest.fn();
+const mockClear = jest.fn();
 
 beforeEach(() => {
+  // Ensure env var is set for each test
   process.env.NEXT_PUBLIC_CONTRACT_ID = '0x1234567890abcdef';
   
   mockUseToast.mockReturnValue({ showToast: mockShowToast });
@@ -104,7 +105,12 @@ beforeEach(() => {
     isConnected: true,
     connect: jest.fn(),
     disconnect: jest.fn(),
-    signTransaction: jest.fn(),
+    isLoading: false,
+    error: null,
+    reputation: 0,
+    activeProvider: 'freighter',
+    availableProviders: [],
+    setMockPublicKey: jest.fn(),
   });
   mockUseRole.mockReturnValue({
     role: 'admin',
@@ -116,7 +122,11 @@ beforeEach(() => {
     error: null,
     refreshRole: jest.fn(),
   });
-  mockUseEvents.mockReturnValue({ emit: mockEmit });
+  mockUseEvents.mockReturnValue({ 
+    emit: mockEmit, 
+    timeline: [], 
+    clear: mockClear 
+  });
   mockHaltContract.mockResolvedValue('abcdef1234567890');
   const { useChainState } = require('@/hooks/useChainState');
   useChainState.mockReturnValue({ forceSync: jest.fn(), isHalted: false });
@@ -141,7 +151,12 @@ describe('EmergencyHaltButton', () => {
         isConnected: false,
         connect: jest.fn(),
         disconnect: jest.fn(),
-        signTransaction: jest.fn(),
+        isLoading: false,
+        error: null,
+        reputation: 0,
+        activeProvider: null,
+        availableProviders: [],
+        setMockPublicKey: jest.fn(),
       });
       render(<EmergencyHaltButton />);
       const button = screen.getByRole('button');
@@ -305,7 +320,7 @@ describe('EmergencyHaltButton', () => {
 
   describe('Edge cases', () => {
     it('shows halting state while processing', async () => {
-      let resolve: (value: string) => void;
+      let resolve: (value: string) => void = () => {};
       mockHaltContract.mockReturnValue(new Promise((res) => { resolve = res; }));
 
       render(<EmergencyHaltButton />);
