@@ -23,26 +23,26 @@
     "d3-scale": "^4.0.2",
     "d3-scale-chromatic": "^3.1.0",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.6.1",
+    "express-rate-limit": "^8.6.2",
     "gridstack": "^13.0.2",
     "i18next": "^26.3.6",
     "jspdf": "^4.2.1",
-    "lucide-react": "^1.30.0",
+    "lucide-react": "^1.31.0",
     "next": "14.2.35",
-    "papaparse": "^5.5.4",
+    "papaparse": "^5.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^17.0.11",
     "recharts": "3.10.1",
-    "shepherd.js": "15.2.2",
+    "shepherd.js": "15.2.3",
     "socket.io-client": "^4.8.3",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.4.5",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.3",
+    "@testing-library/user-event": "^14.6.4",
     "@types/cytoscape": "^3.21.7",
     "@types/d3-scale": "^4.0.9",
     "@types/d3-scale-chromatic": "^3.1.0",
@@ -61,5 +61,6 @@
     "supertest": "^7.2.2",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.4.5"
-  }
+  },
+  "license": "MIT"
 }

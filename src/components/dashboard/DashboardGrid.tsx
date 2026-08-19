@@ -107,7 +107,6 @@ export default function DashboardGrid({
         const parsed = JSON.parse(saved);
         const sanitized = sanitizeLayout(parsed, validIds);
 
-        // Add any missing widgets that are in widgets array but not in saved layout
         const savedIds = sanitized.map((item) => item.id);
         const missing = defaultLayout.filter(
           (item) => !savedIds.includes(item.id) && validIds.includes(item.id),
@@ -126,9 +125,7 @@ export default function DashboardGrid({
   useEffect(() => {
     if (!isMounted || layout.length === 0) return;
 
-    // GridStack needs to initialize after React has rendered the DOM
     const timer = setTimeout(() => {
-      // Destroy existing instance if any
       if (gridRef.current) {
         gridRef.current.destroy(false);
         gridRef.current = null;
@@ -171,7 +168,6 @@ export default function DashboardGrid({
   const handleResetLayout = () => {
     localStorage.removeItem(storageKey);
     setLayout([]);
-    // Trigger state reset next tick
     setTimeout(() => {
       setLayout(defaultLayout);
     }, 0);
@@ -179,7 +175,7 @@ export default function DashboardGrid({
 
   if (!isMounted) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" role="status" aria-busy="true">
         {widgets.map((w) => (
           <div
             key={w.id}
@@ -197,16 +193,32 @@ export default function DashboardGrid({
       {/* Dashboard Controls */}
       <div className="flex justify-end mb-6">
         <button
+          type="button"
           onClick={handleResetLayout}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          aria-label={t("dashboard.resetLayout", {
+            defaultValue: "Reset dashboard layout to default",
+          })}
+          className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-4 h-4" aria-hidden="true" />
           <span>Reset Layout</span>
         </button>
       </div>
 
+      {/* Screen reader instructions */}
+      <p className="sr-only">
+        Dashboard widgets can be rearranged by dragging the handle at the top of
+        each widget. Use the Reset Layout button to restore the default arrangement.
+      </p>
+
       {/* Grid Stack container */}
-      <div className="grid-stack min-h-[500px]">
+      <div
+        className="grid-stack min-h-[500px]"
+        role="region"
+        aria-label={t("dashboard.gridLabel", {
+          defaultValue: "Dashboard widgets",
+        })}
+      >
         {layout.map((item) => {
           const widget = widgets.find((w) => w.id === item.id);
           if (!widget) return null;
@@ -220,15 +232,27 @@ export default function DashboardGrid({
               gs-y={item.y}
               gs-w={item.w}
               gs-h={item.h}
+              role="group"
+              aria-label={widget.title}
             >
               <div className="grid-stack-item-content bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col h-full overflow-hidden transition-all group-hover:border-slate-300 dark:group-hover:border-slate-700">
                 {/* Drag handle header bar */}
-                <div className="widget-drag-handle flex items-center justify-between pb-2 mb-2 border-b border-slate-150 dark:border-slate-800 cursor-move text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                <div
+                  className="widget-drag-handle flex items-center justify-between pb-2 mb-2 border-b border-slate-150 dark:border-slate-800 cursor-move text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Drag to rearrange ${widget.title} widget`}
+                  title={`Drag to move ${widget.title}`}
+                >
                   <span className="text-xs font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
                     {widget.title}
                   </span>
-                  <GripHorizontal className="w-4 h-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                  <GripHorizontal
+                    className="w-4 h-4 opacity-40 group-hover:opacity-100 transition-opacity"
+                    aria-hidden="true"
+                  />
                 </div>
+
                 <div className="flex-1 overflow-auto h-full min-h-0">
                   {widget.component}
                 </div>
@@ -239,4 +263,4 @@ export default function DashboardGrid({
       </div>
     </div>
   );
-}
+    }
