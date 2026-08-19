@@ -26,6 +26,7 @@ Guardians connect their [Freighter](https://www.freighter.app/) wallet, browse t
 - [Key Concepts](#key-concepts)
   - [Casting a Vote](#casting-a-vote)
   - [Batch Transaction Builder](#batch-transaction-builder)
+  - [Diff Engine](#diff-engine)
   - [Security Scanner Results](#security-scanner-results)
   - [Guardian Reputation](#guardian-reputation)
   - [Wallet Context](#wallet-context)
@@ -35,7 +36,7 @@ Guardians connect their [Freighter](https://www.freighter.app/) wallet, browse t
 - [Testing](#testing)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Deployment Checklist](#deployment-checklist)
-- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
@@ -431,6 +432,25 @@ import BatchTxBuilder from '@/components/BatchTxBuilder';
 // the shared batch transaction builder in a single wallet approval.
 <BatchTxBuilder />
 Pressing Build & broadcast maps the queue to ordered operations and calls signAndBroadcastBatchTransaction(), so the whole batch is signed and submitted as one transaction. A broadcaster prop can be supplied to inject a custom builder (used in tests). No private keys are handled, requested, logged, or stored.
+Diff Engine
+
+`src/components/DiffEngine` detects **state drift** between the deployed on-chain contract and the repository source. It compares the ABI definition and compiled bytecode from both sources pairwise, and renders an auditor-ready summary so Guardians can confirm the contract they are voting on matches what is in the codebase. See the [full usage guide](docs/diff-engine.md) for props, walkthrough, and output interpretation.
+
+```tsx
+import { DiffEngine } from '@/components/DiffEngine';
+
+<DiffEngine
+  onChainAbi={onChainAbi}
+  repoAbi={repoAbi}
+  onChainBytecode={onChainBytecode}
+  repoBytecode={repoBytecode}
+/>
+```
+
+The component shows a green **"On-chain state matches repository version perfectly."** banner when both checks pass. If either the ABI or the bytecode diverges, it shows a red **"State drift identified. Auditor-ready report generated."** banner along with per-check cards that identify whether the mismatch is in the ABI, the bytecode, or both.
+
+All ABI inputs are sanitized (HTML/script tags stripped) before comparison. Bytecode is whitespace-trimmed. No `dangerouslySetInnerHTML` is used.
+
 Security Scanner Results
 src/components/security/ provides a reusable UI module for static-analysis and vulnerability scanner JSON. The dashboard renders <SecurityScannerResults /> with a local JSON input, and callers can also pass scanner output directly:
 code
@@ -863,11 +883,6 @@ Configure GitHub webhook secret and validate X-Hub-Signature-256 in the relayer
 
 Rate-limit the /github-webhook endpoint
 
----
+## License
 
-## Contributing
-
-Contributions are welcome. See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for local
-setup, branch naming, commit conventions, the test/lint commands CI runs, and the
-requirement to link every pull request to its issue with `Closes #ISSUE_NUMBER`.
-Code style is documented in **[STYLEGUIDE.md](./STYLEGUIDE.md)**.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
