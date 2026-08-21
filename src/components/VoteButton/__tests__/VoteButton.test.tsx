@@ -70,6 +70,8 @@ beforeEach(() => {
       networkPassphrase: 'Test SDF Network ; September 2015',
     },
     isCustomConfig: false,
+    urlError: null,
+    clearUrlError: jest.fn(),
     setHorizonUrl: jest.fn(),
     setSorobanRpcUrl: jest.fn(),
     setNetworkPassphrase: jest.fn(),

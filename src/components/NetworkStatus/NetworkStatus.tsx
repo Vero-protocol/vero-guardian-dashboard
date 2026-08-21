@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Clock3, WifiOff, Settings, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNetwork } from '@/context/NetworkContext';
-import { validateUrl, defaultNetworkConfig } from '@/services/rpc';
+import { getUrlValidationError, defaultNetworkConfig } from '@/services/rpc';
 const RPC_HEALTH_REQUEST_BODY = '{"jsonrpc":"2.0","id":1,"method":"getHealth"}';
 
 export const HEARTBEAT_INTERVAL_MS = 10_000;
@@ -215,13 +215,22 @@ export default function NetworkStatus({
   now = Date.now,
 }: NetworkStatusProps) {
   const { t } = useTranslation();
-  const { networkConfig, setHorizonUrl, setSorobanRpcUrl, setNetworkPassphrase, resetToDefaults } = useNetwork();
+  const {
+    networkConfig,
+    urlError,
+    clearUrlError,
+    setHorizonUrl,
+    setSorobanRpcUrl,
+    setNetworkPassphrase,
+    resetToDefaults,
+  } = useNetwork();
   const [showSettings, setShowSettings] = useState(false);
   const [localHorizonUrl, setLocalHorizonUrl] = useState(networkConfig.horizonUrl);
   const [localSorobanRpcUrl, setLocalSorobanRpcUrl] = useState(networkConfig.sorobanRpcUrl);
   const [localNetworkPassphrase, setLocalNetworkPassphrase] = useState(
     networkConfig.networkPassphrase
   );
+  const [settingsError, setSettingsError] = useState<string | null>(null);
   const rpcEndpoint = endpoint ?? networkConfig.sorobanRpcUrl;
   const [snapshot, setSnapshot] = useState<RpcHealthSnapshot>(INITIAL_SNAPSHOT);
   const latestCheckId = useRef(0);
@@ -268,20 +277,33 @@ export default function NetworkStatus({
   }, [networkConfig]);
 
   const handleSaveSettings = () => {
-    if (validateUrl(localHorizonUrl)) {
-      setHorizonUrl(localHorizonUrl);
+    const horizonError = getUrlValidationError(localHorizonUrl);
+    if (horizonError) {
+      setSettingsError(`Horizon URL: ${horizonError}`);
+      return;
     }
-    if (validateUrl(localSorobanRpcUrl)) {
-      setSorobanRpcUrl(localSorobanRpcUrl);
+
+    const sorobanError = getUrlValidationError(localSorobanRpcUrl);
+    if (sorobanError) {
+      setSettingsError(`Soroban RPC URL: ${sorobanError}`);
+      return;
     }
+
+    setHorizonUrl(localHorizonUrl);
+    setSorobanRpcUrl(localSorobanRpcUrl);
     setNetworkPassphrase(localNetworkPassphrase);
+    setSettingsError(null);
+    clearUrlError();
     setShowSettings(false);
   };
 
   const handleReset = () => {
     resetToDefaults();
+    setSettingsError(null);
     setShowSettings(false);
   };
+
+  const displayedSettingsError = settingsError ?? urlError;
 
   return (
     <section
@@ -333,6 +355,15 @@ export default function NetworkStatus({
             </button>
           </div>
           <div className="space-y-3">
+            {displayedSettingsError ? (
+              <p
+                role="alert"
+                data-testid="network-settings-url-error"
+                className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200"
+              >
+                {displayedSettingsError}
+              </p>
+            ) : null}
             <div>
               <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Horizon URL
@@ -340,7 +371,10 @@ export default function NetworkStatus({
               <input
                 type="text"
                 value={localHorizonUrl}
-                onChange={(e) => setLocalHorizonUrl(e.target.value)}
+                onChange={(e) => {
+                  setLocalHorizonUrl(e.target.value);
+                  setSettingsError(null);
+                }}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs bg-white dark:bg-slate-900 dark:border-slate-700 dark:text-white"
                 placeholder={defaultNetworkConfig.horizonUrl}
               />
@@ -352,7 +386,10 @@ export default function NetworkStatus({
               <input
                 type="text"
                 value={localSorobanRpcUrl}
-                onChange={(e) => setLocalSorobanRpcUrl(e.target.value)}
+                onChange={(e) => {
+                  setLocalSorobanRpcUrl(e.target.value);
+                  setSettingsError(null);
+                }}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs bg-white dark:bg-slate-900 dark:border-slate-700 dark:text-white"
                 placeholder={defaultNetworkConfig.sorobanRpcUrl}
               />
