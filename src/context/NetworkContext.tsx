@@ -55,8 +55,10 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
             parsed.sorobanRpcUrl && validateUrl(parsed.sorobanRpcUrl)
               ? parsed.sorobanRpcUrl
               : defaultNetworkConfig.sorobanRpcUrl,
-          networkPassphrase:
-            parsed.networkPassphrase || defaultNetworkConfig.networkPassphrase,
+          // Network passphrase is a public Stellar network identifier, but CodeQL
+          // treats "passphrase" as sensitive — never restore or persist it in
+          // localStorage. Session-only overrides still work via setNetworkPassphrase.
+          networkPassphrase: defaultNetworkConfig.networkPassphrase,
         });
       }
     } catch {
@@ -64,14 +66,21 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Save config to local storage when it changes
+  // Persist only RPC URLs. Do not write networkPassphrase to Web Storage
+  // (js/clear-text-storage-of-sensitive-data — "passphrase" is a sensitive sink name).
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(networkConfig));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          horizonUrl: networkConfig.horizonUrl,
+          sorobanRpcUrl: networkConfig.sorobanRpcUrl,
+        }),
+      );
     } catch {
       // Ignore storage failures, matching the load path above.
     }
-  }, [networkConfig]);
+  }, [networkConfig.horizonUrl, networkConfig.sorobanRpcUrl]);
 
   const isCustomConfig = useMemo(
     () =>

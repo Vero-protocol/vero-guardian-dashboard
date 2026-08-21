@@ -109,7 +109,6 @@ describe('NetworkContext URL scheme restrictions', () => {
       JSON.stringify({
         horizonUrl: 'http://evil.example',
         sorobanRpcUrl: defaultNetworkConfig.sorobanRpcUrl,
-        networkPassphrase: defaultNetworkConfig.networkPassphrase,
       }),
     );
 
