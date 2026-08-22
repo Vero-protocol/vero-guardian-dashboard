@@ -132,6 +132,49 @@ describe('fetchUserRole', () => {
     await expect(fetchUserRole(PUBLIC_KEY)).resolves.toBe('unauthorized');
   });
 
+  it('explicitly protects the self-account admin fallback', async () => {
+    mockHorizonAccount({ admin: ACTIVE_VALUE });
+
+    await expect(fetchUserRole(PUBLIC_KEY)).resolves.toBe('admin');
+    expectHorizonAccountFetch(PUBLIC_KEY);
+  });
+
+  it('explicitly protects the self-account guardian fallback', async () => {
+    mockHorizonAccount({ guardian: ACTIVE_VALUE });
+
+    await expect(fetchUserRole(PUBLIC_KEY)).resolves.toBe('guardian');
+    expectHorizonAccountFetch(PUBLIC_KEY);
+  });
+
+  it('returns admin for an admin underscore marker scoped to the public key', async () => {
+    mockRegistryRoleData({
+      [`admin_${PUBLIC_KEY}`]: ACTIVE_VALUE,
+    });
+
+    await expect(fetchUserRole(PUBLIC_KEY)).resolves.toBe('admin');
+    expectHorizonAccountFetch(REGISTRY_ACCOUNT);
+  });
+
+  it('ignores malformed account data values', async () => {
+    mockHorizonAccount({
+      admin: '%%%not-valid-base64%%%',
+      [`admin:${PUBLIC_KEY}`]: '%%%also-invalid%%%',
+    });
+
+    await expect(fetchUserRole(PUBLIC_KEY)).resolves.toBe('unauthorized');
+  });
+
+  it('returns unauthorized when data_attr is absent', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({}),
+    } as Response);
+
+    await expect(fetchUserRole(PUBLIC_KEY)).resolves.toBe('unauthorized');
+    expectHorizonAccountFetch(PUBLIC_KEY);
+  });
+
   it('returns unauthorized when no role data exists', async () => {
     mockHorizonAccount({});
 
