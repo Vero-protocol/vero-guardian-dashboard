@@ -1,5 +1,5 @@
 import { act, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { afterEach, describe, expect, jest, test } from '@jest/globals';
 import { NetworkProvider } from '@/context/NetworkContext';
 import TransactionFeed, {
   toFeedTransaction,
@@ -79,7 +79,11 @@ describe('toFeedTransaction', () => {
   });
 
   test('applies safe defaults for missing optional fields', () => {
-    const record = makeRecord({ ledger_attr: undefined, operation_count: undefined, successful: undefined });
+    const record = makeRecord({
+      ledger_attr: undefined,
+      operation_count: undefined,
+      successful: undefined,
+    });
     const mapped = toFeedTransaction(record);
     expect(mapped.ledger).toBe(0);
     expect(mapped.operationCount).toBe(0);
@@ -139,7 +143,9 @@ describe('TransactionFeed', () => {
 
   test('prepends newest transactions and caps the feed at maxEntries', () => {
     const { subscribe, handlersRef, auditAppender } = createControllableSubscriber();
-    renderWithProviders(<TransactionFeed subscribe={subscribe} maxEntries={3} auditAppender={auditAppender} />);
+    renderWithProviders(
+      <TransactionFeed subscribe={subscribe} maxEntries={3} auditAppender={auditAppender} />,
+    );
 
     act(() => {
       for (let i = 1; i <= 5; i += 1) {
@@ -174,7 +180,8 @@ describe('TransactionFeed', () => {
       handlersRef.current?.onMessage(feedTx({ successful: false }));
     });
 
-    expect(screen.getByLabelText('Failed transaction')).toBeTruthy();
+    // Text lives in an sr-only span (not aria-label) after a11y updates
+    expect(screen.getByText(/Failed transaction/i)).toBeTruthy();
   });
 
   test('surfaces a disconnected status and message on stream error', () => {
@@ -196,7 +203,9 @@ describe('TransactionFeed', () => {
 
   test('unsubscribes from the stream on unmount', () => {
     const { subscribe, unsubscribe, auditAppender } = createControllableSubscriber();
-    const { unmount } = renderWithProviders(<TransactionFeed subscribe={subscribe} auditAppender={auditAppender} />);
+    const { unmount } = renderWithProviders(
+      <TransactionFeed subscribe={subscribe} auditAppender={auditAppender} />,
+    );
 
     expect(unsubscribe).not.toHaveBeenCalled();
     unmount();
