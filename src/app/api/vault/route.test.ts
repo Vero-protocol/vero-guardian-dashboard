@@ -1,81 +1,98 @@
 /**
  * @jest-environment node
  */
+import { GET, POST } from './route';
 
-import { POST, GET } from './route';
+const ORIGINAL_SECRET = process.env.VAULT_API_SECRET;
 
-describe('/api/vault auth + error sanitization', () => {
-  const originalSecret = process.env.VAULT_API_SECRET;
+beforeEach(() => {
+  process.env.VAULT_API_SECRET = 'test-vault-secret';
+});
 
-  beforeEach(() => {
-    process.env.VAULT_API_SECRET = 'test-vault-secret';
-  });
+afterEach(() => {
+  if (ORIGINAL_SECRET === undefined) {
+    delete process.env.VAULT_API_SECRET;
+  } else {
+    process.env.VAULT_API_SECRET = ORIGINAL_SECRET;
+  }
+  jest.restoreAllMocks();
+});
 
-  afterEach(() => {
-    if (originalSecret === undefined) {
-      delete process.env.VAULT_API_SECRET;
-    } else {
-      process.env.VAULT_API_SECRET = originalSecret;
-    }
-  });
+function authHeaders(token = 'test-vault-secret'): HeadersInit {
+  return { Authorization: `Bearer ${token}` };
+}
 
-  test('rejects unauthenticated POST (no Authorization header)', async () => {
-    const res = await POST(
-      new Request('http://localhost/api/vault', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'encrypt', secret: 'S', keyId: 'k', keyMaterial: 'm' }),
-      }),
-    );
-
-    expect(res.status).toBe(401);
-    const body = await res.json();
-    expect(body.error).toBe('Unauthorized');
-  });
-
-  test('rejects POST with invalid Bearer token', async () => {
-    const res = await POST(
-      new Request('http://localhost/api/vault', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer wrong-token',
-        },
-        body: JSON.stringify({ action: 'encrypt', secret: 'S', keyId: 'k', keyMaterial: 'm' }),
-      }),
-    );
-
-    expect(res.status).toBe(401);
-    const body = await res.json();
-    expect(body.error).toBe('Unauthorized');
-  });
-
-  test('rejects unauthenticated GET', async () => {
+describe('GET /api/vault', () => {
+  test('rejects unauthenticated requests with 401', async () => {
     const res = await GET(new Request('http://localhost/api/vault'));
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.error).toBe('Unauthorized');
   });
 
-  test('sanitized error response does not leak internal details', async () => {
-    // Force a server error by sending invalid JSON after auth passes
-    // (or mock vault to throw). Here we pass auth but broken body that
-    // still hits the catch path via invalid structure after parse.
+  test('rejects invalid bearer token with 401', async () => {
+    const res = await GET(
+      new Request('http://localhost/api/vault', { headers: authHeaders('wrong') }),
+    );
+    expect(res.status).toBe(401);
+  });
+
+  test('returns generic 500 when VAULT_API_SECRET is missing', async () => {
+    delete process.env.VAULT_API_SECRET;
+    const res = await GET(
+      new Request('http://localhost/api/vault', { headers: authHeaders() }),
+    );
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toBe('An internal error occurred');
+  });
+});
+
+describe('POST /api/vault', () => {
+  test('rejects unauthenticated requests with 401', async () => {
+    const res = await POST(
+      new Request('http://localhost/api/vault', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'encrypt' }),
+      }),
+    );
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error).toBe('Unauthorized');
+  });
+
+  test('does not leak internal error details on failure', async () => {
     const res = await POST(
       new Request('http://localhost/api/vault', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer test-vault-secret',
+          ...authHeaders(),
         },
+        // Invalid body forces a failure path after auth
         body: 'not-json',
       }),
     );
-
     expect(res.status).toBe(500);
     const body = await res.json();
     expect(body.error).toBe('An internal error occurred');
-    // Must not contain stack traces or raw exception messages
-    expect(JSON.stringify(body)).not.toMatch(/SyntaxError|Unexpected token|stack/i);
+    expect(JSON.stringify(body)).not.toMatch(/SyntaxError|Unexpected|stack/i);
+  });
+
+  test('returns 400 for invalid action when authenticated', async () => {
+    const res = await POST(
+      new Request('http://localhost/api/vault', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeaders(),
+        },
+        body: JSON.stringify({ action: 'unknown' }),
+      }),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toBe('Invalid action');
   });
 });
