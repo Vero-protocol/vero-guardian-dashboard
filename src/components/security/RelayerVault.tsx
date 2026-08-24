@@ -28,6 +28,7 @@ export default function RelayerVault(): ReactElement {
     warning?: string;
   } | null>(null);
   const [isStatusLoading, setIsStatusLoading] = useState(false);
+  const [statusError, setStatusError] = useState('');
 
   // Encrypt Form State
   const [secret, setSecret] = useState('');
@@ -57,15 +58,20 @@ export default function RelayerVault(): ReactElement {
       if (res.ok) {
         const data = await res.json();
         setStatus(data);
+        setStatusError('');
       } else {
-        console.error('Failed to load vault status');
+        setStatusError(
+          t('relayerVault.statusLoadError', 'Unable to load vault status. Please try again.'),
+        );
       }
-    } catch (err) {
-      console.error('Error fetching vault status:', err);
+    } catch {
+      setStatusError(
+        t('relayerVault.statusLoadError', 'Unable to load vault status. Please try again.'),
+      );
     } finally {
       setIsStatusLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchStatus();
@@ -208,6 +214,27 @@ export default function RelayerVault(): ReactElement {
         {/* TAB 1: STATUS */}
         {activeTab === 'status' && (
           <div className="space-y-4">
+            {statusError && (
+              <div
+                role="alert"
+                className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-800 dark:border-red-950/40 dark:bg-red-950/20 dark:text-red-300"
+              >
+                <span className="flex items-center gap-2">
+                  <ShieldAlert className="h-5 w-5 shrink-0 text-red-500" aria-hidden="true" />
+                  {statusError}
+                </span>
+                <button
+                  type="button"
+                  onClick={fetchStatus}
+                  disabled={isStatusLoading}
+                  className="shrink-0 rounded-lg border border-red-300 px-2.5 py-1 font-semibold transition hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 dark:border-red-800 dark:hover:bg-red-950/40"
+                >
+                  {isStatusLoading
+                    ? t('common.retrying', 'Retrying...')
+                    : t('common.tryAgain', 'Try again')}
+                </button>
+              </div>
+            )}
             {status ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 rounded-xl border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
@@ -255,11 +282,11 @@ export default function RelayerVault(): ReactElement {
                   </div>
                 )}
               </div>
-            ) : (
+            ) : !statusError ? (
               <div className="text-sm text-slate-500 animate-pulse">
                 {t('relayerVault.loadingStatus', 'Fetching vault status...')}
               </div>
-            )}
+            ) : null}
           </div>
         )}
 
