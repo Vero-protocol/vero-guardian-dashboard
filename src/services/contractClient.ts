@@ -1,5 +1,5 @@
 import * as StellarSdk from '@stellar/stellar-sdk';
-import { signTransaction } from '@stellar/freighter-api';
+import { getWalletProvider, type WalletProviderId } from '../lib/wallets';
 import { defaultNetworkConfig, DEFAULT_HORIZON_URL, CONSENSUS_THRESHOLD_KEY } from './rpc';
 
 /**
@@ -15,7 +15,8 @@ export async function castVote(
   prId: number,
   publicKey: string,
   horizonUrl: string = defaultNetworkConfig.horizonUrl,
-  networkPassphrase: string = defaultNetworkConfig.networkPassphrase
+  networkPassphrase: string = defaultNetworkConfig.networkPassphrase,
+  providerId: WalletProviderId = 'freighter'
 ): Promise<string> {
   const server = new StellarSdk.Horizon.Server(horizonUrl);
   const account = await server.loadAccount(publicKey);
@@ -30,16 +31,15 @@ export async function castVote(
     .setTimeout(30)
     .build();
 
-  const signed = await signTransaction(tx.toXDR(), {
-    networkPassphrase,
-    address: publicKey,
-  });
-  if (signed.error) {
-    throw new Error(signed.error.message ?? 'Freighter failed to sign the vote transaction');
+  const provider = getWalletProvider(providerId);
+  if (!provider.signTransaction) {
+    throw new Error(`Wallet provider ${providerId} does not support signing`);
   }
 
+  const signedXdr = await provider.signTransaction(tx.toXDR(), { networkPassphrase });
+
   const signedTx = StellarSdk.TransactionBuilder.fromXDR(
-    signed.signedTxXdr,
+    signedXdr,
     networkPassphrase
   );
 
@@ -157,7 +157,8 @@ export async function haltContract(
   publicKey: string,
   contractId: string,
   sorobanRpcUrl: string = defaultNetworkConfig.sorobanRpcUrl,
-  networkPassphrase: string = defaultNetworkConfig.networkPassphrase
+  networkPassphrase: string = defaultNetworkConfig.networkPassphrase,
+  providerId: WalletProviderId = 'freighter'
 ): Promise<string> {
   const server = new StellarSdk.SorobanRpc.Server(sorobanRpcUrl);
   const account = await server.getAccount(publicKey);
@@ -179,16 +180,15 @@ export async function haltContract(
 
   const preparedTx = StellarSdk.SorobanRpc.assembleTransaction(rawTx, simulation) as any;
 
-  const signed = await signTransaction(preparedTx.toXDR(), {
-    networkPassphrase,
-    address: publicKey,
-  });
-  if (signed.error) {
-    throw new Error(signed.error.message ?? 'Freighter failed to sign the halt transaction');
+  const provider = getWalletProvider(providerId);
+  if (!provider.signTransaction) {
+    throw new Error(`Wallet provider ${providerId} does not support signing`);
   }
 
+  const signedXdr = await provider.signTransaction(preparedTx.toXDR(), { networkPassphrase });
+
   const signedTx = StellarSdk.TransactionBuilder.fromXDR(
-    signed.signedTxXdr,
+    signedXdr,
     networkPassphrase
   );
 

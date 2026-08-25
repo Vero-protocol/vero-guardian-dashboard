@@ -11,6 +11,7 @@ import { useChainState } from '@/hooks/useChainState';
 import { useVoteTransaction } from '@/hooks/useVoteTransaction';
 import TransactionNotification from '@/components/TransactionNotification';
 import { getStellarExplorerTxUrl } from '@/lib/stellar-expert';
+import { useWallet } from '@/context/WalletContext';
 
 interface VoteButtonProps {
   prId: number;
@@ -26,6 +27,7 @@ type VoteButtonState =
   | 'checking-access'
   | 'missing-wallet'
   | 'unauthorized'
+  | 'unsupported-wallet'
   | 'ready';
 
 function getVoteButtonState(
@@ -34,11 +36,13 @@ function getVoteButtonState(
   isRoleLoading: boolean,
   hasPublicKey: boolean,
   canVote: boolean,
+  isRabet: boolean
 ): VoteButtonState {
   if (voted) return 'voted';
   if (isPending) return 'pending';
   if (isRoleLoading) return 'checking-access';
   if (!hasPublicKey) return 'missing-wallet';
+  if (isRabet) return 'unsupported-wallet';
   if (!canVote) return 'unauthorized';
   return 'ready';
 }
@@ -53,6 +57,8 @@ function getVoteAriaLabel(prId: number, state: VoteButtonState, t: TFunction): s
       return t('vote.aria.checkingAccess', { prId });
     case 'missing-wallet':
       return t('vote.aria.missingWallet', { prId });
+    case 'unsupported-wallet':
+      return t('vote.aria.unsupportedWallet', { prId, defaultValue: 'Unsupported wallet' });
     case 'unauthorized':
       return t('vote.aria.unauthorized', { prId });
     default:
@@ -69,6 +75,7 @@ function getVoteButtonClassName(state: VoteButtonState): string {
       return `${VOTE_BUTTON_BASE_CLASSNAME} bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600 cursor-wait`;
     case 'missing-wallet':
     case 'unauthorized':
+    case 'unsupported-wallet':
       return `${VOTE_BUTTON_BASE_CLASSNAME} bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed`;
     default:
       return `${VOTE_BUTTON_BASE_CLASSNAME} bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-900/20`;
@@ -88,6 +95,8 @@ function getVoteButtonContent(state: VoteButtonState, t: TFunction): ReactElemen
       );
     case 'checking-access':
       return t('vote.checking');
+    case 'unsupported-wallet':
+      return t('vote.unsupportedWallet', { defaultValue: 'Rabet voting soon' });
     case 'unauthorized':
       return t('vote.unauthorized');
     default:
@@ -100,6 +109,7 @@ export default function VoteButton({ prId, publicKey }: VoteButtonProps): ReactE
   const { showToast } = useToast();
   const { canVote, isLoading: isRoleLoading } = useRole();
   const { networkConfig } = useNetwork();
+  const { activeProvider } = useWallet();
   useChainState({
     cacheKeys: publicKey
       ? ['dashboard', 'prs', 'transactions', `account:${publicKey}`, `reputation:${publicKey}`]
@@ -109,6 +119,7 @@ export default function VoteButton({ prId, publicKey }: VoteButtonProps): ReactE
   const { state: txState, submit, reset } = useVoteTransaction({
     prId,
     publicKey: publicKey ?? '',
+    providerId: activeProvider ?? 'freighter',
     horizonUrl: networkConfig.horizonUrl,
     networkPassphrase: networkConfig.networkPassphrase,
   });
@@ -116,8 +127,9 @@ export default function VoteButton({ prId, publicKey }: VoteButtonProps): ReactE
   const voted = txState.status === 'success';
   const isPending = txState.status === 'pending';
   const hasPublicKey = Boolean(publicKey);
+  const isRabet = activeProvider === 'rabet';
 
-  const voteButtonState = getVoteButtonState(voted, isPending, isRoleLoading, hasPublicKey, canVote);
+  const voteButtonState = getVoteButtonState(voted, isPending, isRoleLoading, hasPublicKey, canVote, isRabet);
   const isDisabled = voteButtonState !== 'ready';
 
   async function handleVote(): Promise<void> {

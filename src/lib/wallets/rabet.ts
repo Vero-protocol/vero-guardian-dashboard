@@ -10,6 +10,7 @@ interface RabetConnectResult {
 
 interface RabetApi {
   connect: () => Promise<RabetConnectResult>;
+  sign: (xdr: string, network: string) => Promise<{ xdr: string; error?: string }>;
 }
 
 declare global {
@@ -53,5 +54,26 @@ export const rabetProvider: StellarWalletProvider = {
     }
 
     return result.publicKey;
+  },
+  signTransaction: async (xdr: string, opts?: { networkPassphrase?: string }) => {
+    const rabet = getRabet();
+    if (!rabet) {
+      throw new Error('Rabet wallet is not installed');
+    }
+    const network = opts?.networkPassphrase?.includes('Test SDF Network') ? 'testnet' : 'mainnet';
+    try {
+      const result = await rabet.sign(xdr, network);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      if (!result.xdr) {
+        throw new Error('Rabet returned an empty signature');
+      }
+      return result.xdr;
+    } catch (error) {
+      throw new Error(
+        getWalletErrorMessage(error, 'Rabet failed to sign the transaction')
+      );
+    }
   },
 };

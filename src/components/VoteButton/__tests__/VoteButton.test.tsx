@@ -24,6 +24,9 @@ jest.mock('@/context/NetworkContext', () => ({
     },
   })),
 }));
+jest.mock('@/context/WalletContext', () => ({
+  useWallet: jest.fn(),
+}));
 jest.mock('@/hooks/useChainState', () => ({
   useChainState: jest.fn(() => ({ forceSync: jest.fn() })),
 }));
@@ -37,6 +40,8 @@ const mockCastVote = castVote as jest.MockedFunction<typeof castVote>;
 const mockUseRole = useRole as jest.MockedFunction<typeof useRole>;
 const mockUseToast = useToast as jest.MockedFunction<typeof useToast>;
 const mockUseNetwork = useNetwork as jest.MockedFunction<typeof useNetwork>;
+const { useWallet } = require('@/context/WalletContext');
+const mockUseWallet = useWallet as jest.MockedFunction<typeof useWallet>;
 const mockShowToast = jest.fn();
 const mockRefreshRole = jest.fn();
 
@@ -77,6 +82,18 @@ beforeEach(() => {
     setNetworkPassphrase: jest.fn(),
     resetToDefaults: jest.fn(),
   });
+  mockUseWallet.mockReturnValue({
+    publicKey: 'GPUBKEY',
+    isConnected: true,
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    isLoading: false,
+    error: null,
+    reputation: 0,
+    activeProvider: 'freighter',
+    availableProviders: [],
+    setMockPublicKey: jest.fn(),
+  });
   mockRole();
   mockCastVote.mockResolvedValue('deafhash');
 });
@@ -96,6 +113,7 @@ describe('VoteButton', () => {
       'GPUBKEY',
       expect.any(String),
       expect.any(String),
+      expect.any(String),
     ));
     await waitFor(() =>
       expect(appendAuditEvent).toHaveBeenCalledWith(
@@ -110,6 +128,18 @@ describe('VoteButton', () => {
   });
 
   it('is disabled when no wallet is connected', () => {
+    mockUseWallet.mockReturnValue({
+      publicKey: null,
+      isConnected: false,
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+      isLoading: false,
+      error: null,
+      reputation: 0,
+      activeProvider: null,
+      availableProviders: [],
+      setMockPublicKey: jest.fn(),
+    });
     const button = renderVoteButton(null);
 
     expect(button).toBeDisabled();
