@@ -7,16 +7,49 @@ import {
   createSoftwareProviderForTests,
 } from '@/services/vault';
 
-export async function GET() {
+const GENERIC_ERROR = 'An internal error occurred';
+
+function requireAuth(request: Request): NextResponse | null {
+  const secret = process.env.VAULT_API_SECRET;
+  if (!secret) {
+    console.error('[vault] VAULT_API_SECRET is not configured');
+    return NextResponse.json({ error: GENERIC_ERROR }, { status: 500 });
+  }
+
+  const header = request.headers.get('authorization');
+  if (!header || !header.startsWith('Bearer ')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const token = header.slice('Bearer '.length).trim();
+  if (token !== secret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  return null;
+}
+
+function genericErrorResponse(error: unknown): NextResponse {
+  console.error('[vault]', error);
+  return NextResponse.json({ error: GENERIC_ERROR }, { status: 500 });
+}
+
+export async function GET(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const status = getVaultSecretStatus('STELLAR_SECRET_KEY');
     return NextResponse.json(status);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return genericErrorResponse(error);
   }
 }
 
 export async function POST(request: Request) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { action } = body;
@@ -75,7 +108,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return genericErrorResponse(error);
   }
 }
