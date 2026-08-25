@@ -53,6 +53,40 @@ describe('RelayerVault Component', () => {
     });
   });
 
+  it('shows a retryable error when the status request is not successful', async () => {
+    fetchMock
+      .mockResolvedValueOnce({ ok: false })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ configured: true, hardwareBacked: false }),
+      });
+
+    render(<RelayerVault />);
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Unable to load vault status. Please try again.');
+    expect(screen.queryByText('Fetching vault status...')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Vault Configured')).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows a retryable error when fetching status rejects', async () => {
+    fetchMock.mockRejectedValueOnce(new Error('network unavailable'));
+
+    render(<RelayerVault />);
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Unable to load vault status. Please try again.');
+    expect(screen.queryByText('Fetching vault status...')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled();
+  });
+
   it('allows tab switching', async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
@@ -60,6 +94,8 @@ describe('RelayerVault Component', () => {
     });
 
     render(<RelayerVault />);
+
+    await screen.findByText('Vault Not Configured');
 
     // Switch to Encrypt Key tab
     const encryptTab = screen.getByText('Encrypt Key');
@@ -96,6 +132,8 @@ describe('RelayerVault Component', () => {
       });
 
     render(<RelayerVault />);
+
+    await screen.findByText('Vault Not Configured');
 
     // Go to Encrypt
     fireEvent.click(screen.getByText('Encrypt Key'));
@@ -145,6 +183,8 @@ describe('RelayerVault Component', () => {
       });
 
     render(<RelayerVault />);
+
+    await screen.findByText('Vault Not Configured');
 
     // Go to Verify
     fireEvent.click(screen.getByText('Verify Retrieval'));
