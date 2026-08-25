@@ -109,6 +109,13 @@ export async function fetchUserRole(
   horizonUrl: string = DEFAULT_HORIZON_URL
 ): Promise<UserRole> {
   const registryAccount = process.env.NEXT_PUBLIC_ROLE_REGISTRY_ACCOUNT?.trim();
+  const allowSelfRegistry = process.env.NEXT_PUBLIC_ALLOW_SELF_REGISTRY === 'true';
+
+  if (!registryAccount && !allowSelfRegistry) {
+    console.warn('SECURITY WARNING: NEXT_PUBLIC_ROLE_REGISTRY_ACCOUNT is unset and NEXT_PUBLIC_ALLOW_SELF_REGISTRY is false. Refusing self-account role fallback.');
+    return 'unauthorized';
+  }
+
   const accountId = registryAccount || publicKey;
   const response = await fetch(
     `${horizonUrl.replace(/\/+$/, '')}/accounts/${encodeURIComponent(accountId)}`
