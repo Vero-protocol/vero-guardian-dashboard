@@ -6,8 +6,17 @@ import {
   createHardwareBackedProvider,
   createSoftwareProviderForTests,
 } from '@/services/vault';
+import { createRateLimiter } from '@/lib/rate-limit';
 
-export async function GET() {
+// 10 req/min per IP — POST actions run AES-GCM key derivation and crypto
+// operations; GET does a synchronous status read but shares the same budget
+// to prevent enumeration probing.
+const rateLimiter = createRateLimiter({ limit: 10 });
+
+export async function GET(request: Request) {
+  const limited = rateLimiter(request);
+  if (limited) return limited;
+
   try {
     const status = getVaultSecretStatus('STELLAR_SECRET_KEY');
     return NextResponse.json(status);
@@ -17,6 +26,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const limited = rateLimiter(request);
+  if (limited) return limited;
+
   try {
     const body = await request.json();
     const { action } = body;

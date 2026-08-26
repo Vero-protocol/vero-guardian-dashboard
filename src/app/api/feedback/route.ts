@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server';
+import { createRateLimiter } from '@/lib/rate-limit';
+
+// 10 req/min per IP — each submission fans out to an external webhook and
+// runs multi-pass regex sanitization, making it relatively expensive per hit.
+const rateLimiter = createRateLimiter({ limit: 10 });
 
 const MAX_NAME_LENGTH = 80;
 const MAX_EMAIL_LENGTH = 120;
@@ -36,6 +41,9 @@ function isValidEmail(email: string): boolean {
 }
 
 export async function POST(request: Request) {
+  const limited = rateLimiter(request);
+  if (limited) return limited;
+
   try {
     const payload = await request.json();
     const feedback = {
