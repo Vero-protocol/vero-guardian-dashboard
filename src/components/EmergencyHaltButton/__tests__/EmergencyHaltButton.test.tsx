@@ -225,6 +225,7 @@ describe('EmergencyHaltButton', () => {
           expect.any(String),
           expect.any(String),
           expect.any(String),
+          expect.any(String),
         );
       });
     });

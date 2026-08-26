@@ -28,6 +28,7 @@ interface FreighterApiCompat {
   getAddress?: () => Promise<{ address: string; error?: FreighterResultError }>;
   requestAccess?: () => Promise<{ address: string; error?: FreighterResultError }>;
   WatchWalletChanges?: new (timeout?: number) => FreighterWalletWatcher;
+  signTransaction?: (xdr: string, opts?: { networkPassphrase?: string; network?: string }) => Promise<{ signedTxXdr?: string; error?: string | { message?: string } }>;
 }
 
 export const freighterClient = freighterApi as FreighterApiCompat;
@@ -110,5 +111,21 @@ export const freighterProvider: StellarWalletProvider = {
       throw new Error('Freighter wallet is not installed');
     }
     return requestFreighterPublicKey();
+  },
+  signTransaction: async (xdr: string, opts?: { networkPassphrase?: string }) => {
+    if (typeof freighterClient.signTransaction !== 'function') {
+      throw new Error('Freighter signTransaction API is unavailable');
+    }
+    const result = await freighterClient.signTransaction(xdr, {
+      networkPassphrase: opts?.networkPassphrase,
+    });
+    if (result.error) {
+      const msg = typeof result.error === 'string' ? result.error : result.error.message;
+      throw new Error(msg ?? 'Freighter failed to sign the transaction');
+    }
+    if (!result.signedTxXdr) {
+      throw new Error('Freighter returned an empty signature');
+    }
+    return result.signedTxXdr;
   },
 };

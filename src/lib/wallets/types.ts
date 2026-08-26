@@ -17,6 +17,8 @@ export interface StellarWalletProvider {
   isAvailable: () => boolean;
   /** Request access and resolve with the connected public key. Throws on failure. */
   connect: () => Promise<string>;
+  /** Request the wallet to sign the given XDR transaction envelope. */
+  signTransaction?: (xdr: string, opts?: { networkPassphrase?: string; network?: string }) => Promise<string>;
 }
 
 /** Serializable provider metadata exposed to UI components. */

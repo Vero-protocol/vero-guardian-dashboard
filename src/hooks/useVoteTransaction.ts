@@ -40,6 +40,7 @@ function isUserRejection(message: string): boolean {
 export interface UseVoteTransactionOptions {
   prId: number;
   publicKey: string;
+  providerId?: import('@/lib/wallets').WalletProviderId;
   horizonUrl: string;
   networkPassphrase: string;
 }
@@ -60,6 +61,7 @@ export interface UseVoteTransactionResult {
 export function useVoteTransaction({
   prId,
   publicKey,
+  providerId,
   horizonUrl,
   networkPassphrase,
 }: UseVoteTransactionOptions): UseVoteTransactionResult {
@@ -69,7 +71,7 @@ export function useVoteTransaction({
     setState({ status: 'pending', txHash: null, errorKind: null, errorMessage: null });
 
     try {
-      const hash = await castVote(prId, publicKey, horizonUrl, networkPassphrase);
+      const hash = await castVote(prId, publicKey, horizonUrl, networkPassphrase, providerId);
       const next: VoteTxState = { status: 'success', txHash: hash, errorKind: null, errorMessage: null };
       setState(next);
 
@@ -103,7 +105,7 @@ export function useVoteTransaction({
 
       return next;
     }
-  }, [prId, publicKey, horizonUrl, networkPassphrase]);
+  }, [prId, publicKey, horizonUrl, networkPassphrase, providerId]);
 
   const reset = useCallback(() => setState(IDLE_STATE), []);
 

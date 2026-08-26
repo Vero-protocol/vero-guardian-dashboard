@@ -33,12 +33,16 @@ jest.mock('@stellar/stellar-sdk', () => {
   };
 });
 
-jest.mock('@stellar/freighter-api', () => ({
-  signTransaction: jest.fn(),
-}));
+jest.mock('@/lib/wallets', () => {
+  const original = jest.requireActual('@/lib/wallets');
+  return {
+    ...original,
+    getWalletProvider: jest.fn(),
+  };
+});
 
 import { castVote } from '@/services/contractClient';
-import { signTransaction } from '@stellar/freighter-api';
+import { getWalletProvider } from '@/lib/wallets';
 import * as StellarSdk from '@stellar/stellar-sdk';
 
 // Access the mock server instance stored on the Server mock constructor
@@ -47,7 +51,7 @@ const mockServer = (StellarSdk.Horizon.Server as any).__mockServer as {
   submitTransaction: jest.Mock;
 };
 
-const freighterSignTx = signTransaction as jest.MockedFunction<typeof signTransaction>;
+const mockGetWalletProvider = getWalletProvider as jest.Mock;
 
 // ---------------------------------------------------------------------------
 // castVote
@@ -56,6 +60,9 @@ const freighterSignTx = signTransaction as jest.MockedFunction<typeof signTransa
 describe('castVote', () => {
   const PUBLIC_KEY = 'GABC1234';
   const TX_HASH = 'abc123hash';
+  const mockProvider = {
+    signTransaction: jest.fn(),
+  };
 
   beforeEach(() => {
     mockServer.loadAccount.mockResolvedValue({
@@ -66,22 +73,37 @@ describe('castVote', () => {
       id: PUBLIC_KEY,
     });
     mockServer.submitTransaction.mockResolvedValue({ hash: TX_HASH });
-    freighterSignTx.mockResolvedValue({ signedTxXdr: 'signedXDR', signerAddress: PUBLIC_KEY } as any);
+    mockProvider.signTransaction.mockResolvedValue('signedXDR');
+    mockGetWalletProvider.mockReturnValue(mockProvider);
   });
 
   afterEach(() => {
     mockServer.loadAccount.mockReset();
     mockServer.submitTransaction.mockReset();
-    freighterSignTx.mockReset();
+    mockProvider.signTransaction.mockReset();
+    mockGetWalletProvider.mockReset();
   });
 
-  it('returns transaction hash on success', async () => {
+  it('returns transaction hash on success (Freighter default)', async () => {
     const hash = await castVote(42, PUBLIC_KEY);
     expect(hash).toBe(TX_HASH);
-    expect(freighterSignTx).toHaveBeenCalledWith(
+    expect(mockGetWalletProvider).toHaveBeenCalledWith('freighter');
+    expect(mockProvider.signTransaction).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        address: PUBLIC_KEY,
+        networkPassphrase: expect.any(String),
+      })
+    );
+    expect(mockServer.submitTransaction).toHaveBeenCalled();
+  });
+
+  it('returns transaction hash on success using Rabet', async () => {
+    const hash = await castVote(42, PUBLIC_KEY, undefined, undefined, 'rabet');
+    expect(hash).toBe(TX_HASH);
+    expect(mockGetWalletProvider).toHaveBeenCalledWith('rabet');
+    expect(mockProvider.signTransaction).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
         networkPassphrase: expect.any(String),
       })
     );
@@ -93,8 +115,8 @@ describe('castVote', () => {
     await expect(castVote(42, PUBLIC_KEY)).rejects.toThrow('Horizon error');
   });
 
-  it('propagates Freighter signing errors', async () => {
-    freighterSignTx.mockResolvedValue({ error: { message: 'User rejected' } } as any);
+  it('propagates signing errors', async () => {
+    mockProvider.signTransaction.mockRejectedValue(new Error('User rejected'));
     await expect(castVote(42, PUBLIC_KEY)).rejects.toThrow('User rejected');
   });
 });

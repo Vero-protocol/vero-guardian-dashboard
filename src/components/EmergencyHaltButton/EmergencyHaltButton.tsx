@@ -24,6 +24,7 @@ type HaltState =
   | 'halted'
   | 'missing-wallet'
   | 'unauthorized'
+  | 'unsupported-wallet'
   | 'no-contract'
   | 'ready';
 
@@ -34,6 +35,7 @@ function getHaltState(
   hasPublicKey: boolean,
   isAdmin: boolean,
   hasContractId: boolean,
+  isRabet: boolean,
 ): HaltState {
   if (isHalted) {
     return 'halted';
@@ -55,6 +57,10 @@ function getHaltState(
     return 'missing-wallet';
   }
 
+  if (isRabet) {
+    return 'unsupported-wallet';
+  }
+
   if (!isAdmin) {
     return 'unauthorized';
   }
@@ -71,6 +77,7 @@ function getHaltButtonClassName(state: HaltState): string {
       return `${BUTTON_BASE_CLASSNAME} bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 cursor-wait`;
     case 'missing-wallet':
     case 'unauthorized':
+    case 'unsupported-wallet':
     case 'no-contract':
       return `${BUTTON_BASE_CLASSNAME} bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed`;
     default:
@@ -82,7 +89,7 @@ export default function EmergencyHaltButton(): ReactElement {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const { isAdmin } = useRole();
-  const { publicKey } = useWallet();
+  const { publicKey, activeProvider } = useWallet();
   const { networkConfig } = useNetwork();
   const { forceSync } = useChainState({
     cacheKeys: publicKey
@@ -103,6 +110,7 @@ export default function EmergencyHaltButton(): ReactElement {
     hasPublicKey,
     isAdmin,
     hasContractId,
+    activeProvider === 'rabet',
   );
   const isDisabled = haltState !== 'ready' && haltState !== 'confirming';
 
@@ -134,6 +142,7 @@ export default function EmergencyHaltButton(): ReactElement {
         CONTRACT_ID,
         networkConfig.sorobanRpcUrl,
         networkConfig.networkPassphrase,
+        activeProvider ?? 'freighter',
       );
 
       setIsHalted(true);
@@ -220,6 +229,7 @@ export default function EmergencyHaltButton(): ReactElement {
       {haltState === 'halting' && t('emergencyHalt.halting')}
       {haltState === 'no-contract' && t('emergencyHalt.noContract')}
       {haltState === 'missing-wallet' && t('emergencyHalt.missingWallet')}
+      {haltState === 'unsupported-wallet' && t('emergencyHalt.unsupportedWallet', { defaultValue: 'Rabet not supported yet' })}
       {haltState === 'unauthorized' && t('emergencyHalt.unauthorized')}
       {haltState === 'ready' && t('emergencyHalt.label')}
     </button>
