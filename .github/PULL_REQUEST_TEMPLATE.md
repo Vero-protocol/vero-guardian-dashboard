@@ -1,8 +1,10 @@
 ## Related issue
 
-> GrantFox requires every PR to link the issue it resolves. Replace `#123` with the actual issue number.
+> GrantFox requires every PR to link the issue it resolves. Put the closing keyword
+> **in this description** — GitHub ignores it in PR comments, so a link posted as a
+> comment will not register and the issue will not close on merge.
 
-Closes #123
+Closes #
 
 ## Summary
 
