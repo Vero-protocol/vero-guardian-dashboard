@@ -44,52 +44,141 @@ function getCrypto(): Crypto {
 
 let keyPromise: Promise<CryptoKey> | null = null;
 
+const SESSION_KEY_DB_NAME = 'vero-session';
+const SESSION_KEY_STORE_NAME = 'keys';
+const SESSION_KEY_RECORD_ID = 'session-aes-gcm-v1';
+
+interface StoredSessionKeyRecord {
+  id: string;
+  key: CryptoKey;
+  algorithm: 'AES-GCM';
+}
+
+function openSessionKeyDatabase(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') {
+      reject(new Error('IndexedDB is unavailable.'));
+      return;
+    }
+
+    const request = indexedDB.open(SESSION_KEY_DB_NAME, 1);
+
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(SESSION_KEY_STORE_NAME, {
+        keyPath: 'id',
+      });
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () =>
+      reject(request.error ?? new Error('Unable to open session key store.'));
+  });
+}
+
+function readStoredSessionKey(
+  database: IDBDatabase,
+): Promise<CryptoKey | null> {
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(
+      SESSION_KEY_STORE_NAME,
+      'readonly',
+    );
+    const request = transaction
+      .objectStore(SESSION_KEY_STORE_NAME)
+      .get(SESSION_KEY_RECORD_ID);
+
+    request.onsuccess = () => {
+      const record = request.result as
+        | StoredSessionKeyRecord
+        | undefined;
+      resolve(record?.key ?? null);
+    };
+
+    request.onerror = () =>
+      reject(
+        request.error ?? new Error('Unable to read session encryption key.'),
+      );
+  });
+}
+
+function storeSessionKey(
+  database: IDBDatabase,
+  key: CryptoKey,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(
+      SESSION_KEY_STORE_NAME,
+      'readwrite',
+    );
+
+    transaction.objectStore(SESSION_KEY_STORE_NAME).put({
+      id: SESSION_KEY_RECORD_ID,
+      key,
+      algorithm: 'AES-GCM',
+    } satisfies StoredSessionKeyRecord);
+
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () =>
+      reject(
+        transaction.error ?? new Error('Unable to store session encryption key.'),
+      );
+  });
+}
+
 async function getEncryptionKey(): Promise<CryptoKey> {
   if (cachedKey) return cachedKey;
   if (keyPromise) return keyPromise;
 
   keyPromise = (async () => {
     const crypto = getCrypto();
-    const storedKeyJwk = safeSessionStorage.getItem('vero_session_key');
-    if (storedKeyJwk) {
+
+    // Use IndexedDB when available so the session key is not stored
+    // in sessionStorage.
+    if (typeof indexedDB !== 'undefined') {
       try {
-        const jwk = JSON.parse(storedKeyJwk);
-        cachedKey = await crypto.subtle.importKey(
-          'jwk',
-          jwk,
+        const database = await openSessionKeyDatabase();
+        const storedKey = await readStoredSessionKey(database);
+
+        if (storedKey) {
+        if (typeof database.close === "function") { database.close(); }
+          cachedKey = storedKey;
+          return storedKey;
+        }
+
+        const generatedKey = await crypto.subtle.generateKey(
           { name: 'AES-GCM', length: 256 },
           false,
-          ['encrypt', 'decrypt']
+          ['encrypt', 'decrypt'],
         );
-        keyPromise = null;
-        return cachedKey;
-      } catch (e) {
-        console.error('Failed to import session encryption key from sessionStorage:', e);
+
+        await storeSessionKey(database, generatedKey);
+        if (typeof database.close === "function") { database.close(); }
+
+        cachedKey = generatedKey;
+        return generatedKey;
+      } catch (error) {
+        console.error(
+          'Failed to access session encryption key in IndexedDB:',
+          error,
+        );
+        throw error;
       }
     }
 
-    // Generate new key
-    const key = await crypto.subtle.generateKey(
+    // IndexedDB is unavailable in environments such as Jest/Node.
+    // Keep the key in memory for the lifetime of this module.
+    const generatedKey = await crypto.subtle.generateKey(
       { name: 'AES-GCM', length: 256 },
-      true,
-      ['encrypt', 'decrypt']
+      false,
+      ['encrypt', 'decrypt'],
     );
 
-    try {
-      const exported = await crypto.subtle.exportKey('jwk', key);
-      safeSessionStorage.setItem('vero_session_key', JSON.stringify(exported));
-    } catch (e) {
-      console.error('Failed to export and store session encryption key:', e);
-    }
-
-    cachedKey = key;
-    keyPromise = null;
-    return key;
+    cachedKey = generatedKey;
+    return generatedKey;
   })();
 
   return keyPromise;
 }
-
 function bytesToBase64(bytes: Uint8Array): string {
   if (typeof Buffer !== 'undefined') {
     return Buffer.from(bytes).toString('base64');
@@ -157,11 +246,12 @@ export async function getSessionItem(key: string): Promise<string | null> {
   try {
     return await decryptSessionData(value);
   } catch (e) {
-    // Fallback: if value is not encrypted, return it directly.
-    // If it's not encrypted, it won't start with '{' or won't parse properly.
-    if (!value.startsWith('{') || !value.includes('ciphertext')) {
+    // Legacy values may be stored as plaintext.
+    // Return them unchanged when they are not encrypted payloads.
+    if (!value.trim().startsWith('{')) {
       return value;
     }
+
     console.error(`Failed to decrypt session item for key ${key}:`, e);
     return null;
   }
@@ -237,6 +327,8 @@ export class SessionManager {
       this.cleanupListeners();
       this.cleanupListeners = undefined;
     }
+
+    this.isChecking = false;
   }
 
   async checkIdleTimeout() {

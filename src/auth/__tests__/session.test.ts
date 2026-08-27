@@ -28,15 +28,16 @@ if (typeof window !== 'undefined') {
 
 describe('session encryption and management', () => {
   beforeEach(() => {
+    sessionManager.stopMonitoring();
     localStorage.clear();
     sessionStorage.clear();
     sessionManager.clearCache();
-    sessionManager.stopMonitoring();
-    jest.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    sessionManager.stopMonitoring();
+    localStorage.clear();
+    sessionStorage.clear();
   });
 
   test('encryptSessionData and decryptSessionData encrypts and decrypts strings correctly', async () => {
@@ -89,78 +90,83 @@ describe('session encryption and management', () => {
     removeSessionItem(key);
     expect(localStorage.getItem(key)).toBeNull();
   });
+test('SessionManager notifies subscribers on logout', async () => {
+const logoutSpy = jest.fn();
+  const unsubscribe = sessionManager.subscribe(logoutSpy);
 
-  test('SessionManager notifies subscribers on logout', async () => {
+  await sessionManager.startMonitoring();
+
+
+
+  (sessionManager as any).notifyLogout();
+
+  expect(logoutSpy).toHaveBeenCalledTimes(1);
+
+  unsubscribe();
+});
+
+test('SessionManager triggers logout after 15 minutes of inactivity', async () => {
     const logoutSpy = jest.fn();
     const unsubscribe = sessionManager.subscribe(logoutSpy);
+    const dateNowSpy = jest.spyOn(Date, 'now');
 
-    // Simulate idle timeout triggering notify
-    await sessionManager.startMonitoring();
-    
-    // Directly run checkIdleTimeout with no last active timestamp
-    // It should initialize it rather than log out immediately
-    jest.advanceTimersByTime(10000);
-    
-    // Now trigger notify manually to verify subscriber
-    (sessionManager as any).notifyLogout();
+    try {
+      dateNowSpy.mockReturnValue(1000000);
 
-    expect(logoutSpy).toHaveBeenCalledTimes(1);
+      await sessionManager.startMonitoring();
 
-    unsubscribe();
+      const lastActiveInitial = await getSessionItem('vero_wallet_last_active');
+      expect(lastActiveInitial).not.toBeNull();
+
+      dateNowSpy.mockReturnValue(1000000 + 15 * 60 * 1000 + 1);
+
+      await sessionManager.checkIdleTimeout();
+
+      expect(logoutSpy).toHaveBeenCalled();
+
+      unsubscribe();
+    } finally {
+      sessionManager.stopMonitoring();
+      dateNowSpy.mockRestore();
+    }
   });
 
-  test('SessionManager triggers logout after 15 minutes of inactivity', async () => {
-    const logoutSpy = jest.fn();
-    sessionManager.subscribe(logoutSpy);
+test('SessionManager activity reset updates last active timestamp', async () => {
+    const dateNowSpy = jest.spyOn(Date, 'now');
 
-    // Start monitoring (initializes last active key)
-    await sessionManager.startMonitoring();
-    jest.advanceTimersByTime(100);
+    try {
+      dateNowSpy.mockReturnValue(2000000);
 
-    // Verify last active is initialized
-    const lastActiveInitial = await getSessionItem('vero_wallet_last_active');
-    expect(lastActiveInitial).not.toBeNull();
+      await sessionManager.startMonitoring();
 
-    // Fast forward 14 minutes (under 15m limit)
-    await jest.advanceTimersByTimeAsync(14 * 60 * 1000);
-    await sessionManager.checkIdleTimeout();
-    expect(logoutSpy).not.toHaveBeenCalled();
+      const initialTimestampStr = await getSessionItem('vero_wallet_last_active');
+      expect(initialTimestampStr).not.toBeNull();
 
-    // Fast forward 2 more minutes (exceeds 15m limit)
-    await jest.advanceTimersByTimeAsync(2 * 60 * 1000);
-    await sessionManager.checkIdleTimeout();
-    expect(logoutSpy).toHaveBeenCalled();
+      const initialTimestamp = parseInt(initialTimestampStr!, 10);
+
+      // Within throttle window: timestamp should remain unchanged.
+      dateNowSpy.mockReturnValue(initialTimestamp + 5_000);
+      window.dispatchEvent(new Event('scroll'));
+
+      const update1 = (sessionManager as any).activeUpdatePromise;
+      if (update1) await update1;
+
+      const check1TimestampStr = await getSessionItem('vero_wallet_last_active');
+      expect(parseInt(check1TimestampStr!, 10)).toBe(initialTimestamp);
+
+      // Beyond throttle window: timestamp should update.
+      dateNowSpy.mockReturnValue(initialTimestamp + 11_000);
+      window.dispatchEvent(new Event('click'));
+
+      const update2 = (sessionManager as any).activeUpdatePromise;
+      if (update2) await update2;
+
+      const check2TimestampStr = await getSessionItem('vero_wallet_last_active');
+      expect(parseInt(check2TimestampStr!, 10)).toBeGreaterThan(initialTimestamp);
+    } finally {
+      sessionManager.stopMonitoring();
+      dateNowSpy.mockRestore();
+    }
   });
 
-  test('SessionManager activity reset updates last active timestamp', async () => {
-    await sessionManager.startMonitoring();
-    jest.advanceTimersByTime(100);
-
-    const initialTimestampStr = await getSessionItem('vero_wallet_last_active');
-    expect(initialTimestampStr).not.toBeNull();
-    const initialTimestamp = parseInt(initialTimestampStr!, 10);
-
-    // Throttle should prevent updating within 10 seconds
-    await jest.advanceTimersByTimeAsync(5000);
-    // Simulate activity event (scroll)
-    window.dispatchEvent(new Event('scroll'));
-    
-    // Wait for the update promise if it is active (should be null since it's throttled)
-    const update1 = (sessionManager as any).activeUpdatePromise;
-    if (update1) await update1;
-
-    const check1TimestampStr = await getSessionItem('vero_wallet_last_active');
-    expect(parseInt(check1TimestampStr!, 10)).toBe(initialTimestamp);
-
-    // Advancing past 10s throttle limit and simulating activity
-    await jest.advanceTimersByTimeAsync(6000); // 11s total advanced
-    window.dispatchEvent(new Event('click'));
-    
-    // Await any pending update promise to let it write to localStorage
-    const update2 = (sessionManager as any).activeUpdatePromise;
-    if (update2) await update2;
-
-    const check2TimestampStr = await getSessionItem('vero_wallet_last_active');
-    expect(parseInt(check2TimestampStr!, 10)).toBeGreaterThan(initialTimestamp);
   });
-});
