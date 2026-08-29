@@ -48,6 +48,15 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     cacheKeys: publicKey ? [`account:${publicKey}`, `role:${publicKey}`] : ['role'],
   });
 
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_ROLE_REGISTRY_ACCOUNT && process.env.NEXT_PUBLIC_ALLOW_SELF_REGISTRY === 'true') {
+      console.warn(
+        '%c⚠️ SECURITY RISK: NEXT_PUBLIC_ROLE_REGISTRY_ACCOUNT is unconfigured and self-registry is enabled! Any wallet can grant themselves admin privileges.',
+        'color: red; font-size: 14px; font-weight: bold;'
+      );
+    }
+  }, []);
+
   const refreshRole = useCallback(async () => {
     const requestId = requestIdRef.current + 1;
     requestIdRef.current = requestId;
