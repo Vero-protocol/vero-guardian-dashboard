@@ -5,6 +5,7 @@ describe('PushNotificationToggle', () => {
   const requestPermission = jest.fn();
   const subscribe = jest.fn();
   const getSubscription = jest.fn();
+  const unsubscribe = jest.fn();
 
   beforeEach(() => {
     process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY = 'dGVzdA==';
@@ -13,6 +14,8 @@ describe('PushNotificationToggle', () => {
     requestPermission.mockResolvedValue('granted');
     subscribe.mockReset();
     subscribe.mockResolvedValue({});
+    unsubscribe.mockReset();
+    unsubscribe.mockResolvedValue(true);
     getSubscription.mockReset();
     getSubscription.mockResolvedValue(null);
 
@@ -59,5 +62,39 @@ describe('PushNotificationToggle', () => {
         }),
       ),
     );
+  });
+
+  test('unsubscribes and deletes push subscription when already enabled and clicked', async () => {
+    const mockExistingSub = {
+      endpoint: 'https://example.com/push/active-sub',
+      unsubscribe,
+      toJSON: () => ({ endpoint: 'https://example.com/push/active-sub' }),
+    };
+
+    getSubscription.mockResolvedValue(mockExistingSub);
+
+    render(<PushNotificationToggle />);
+
+    // Wait for the initial subscription check to complete and button to display alerts on / disable alerts
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /disable alerts/i })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /disable alerts/i }));
+
+    await waitFor(() => expect(unsubscribe).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/push?endpoint='),
+        expect.objectContaining({
+          method: 'DELETE',
+        }),
+      ),
+    );
+
+    // After unsubscription, button should show enable alerts again
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /enable alerts/i })).toBeInTheDocument();
+    });
   });
 });

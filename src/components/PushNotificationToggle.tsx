@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Bell, BellOff, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { getPushSubscription, savePushSubscription } from '@/services/push';
+import { getPushSubscription, savePushSubscription, deletePushSubscription } from '@/services/push';
 
 async function urlBase64ToUint8Array(base64String: string): Promise<Uint8Array> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -127,6 +127,37 @@ export default function PushNotificationToggle() {
     setError(null);
   }, [registerServiceWorker, t]);
 
+  const unsubscribeFromPush = useCallback(async () => {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      return;
+    }
+
+    let endpoint: string | undefined;
+
+    const registration = await registerServiceWorker();
+    const readyRegistration = registration
+      ? await ((registration as ServiceWorkerRegistration & { ready?: Promise<ServiceWorkerRegistration> }).ready ??
+          navigator.serviceWorker.ready)
+      : null;
+    const pushManager = registration?.pushManager ?? readyRegistration?.pushManager;
+
+    if (pushManager) {
+      const existingSubscription = await pushManager.getSubscription();
+      if (existingSubscription) {
+        endpoint = existingSubscription.endpoint;
+        try {
+          await existingSubscription.unsubscribe();
+        } catch {
+          // Continue removing subscription even if browser unsubscribe throws
+        }
+      }
+    }
+
+    await deletePushSubscription(endpoint);
+    setIsSubscribed(false);
+    setError(null);
+  }, [registerServiceWorker]);
+
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -174,9 +205,14 @@ export default function PushNotificationToggle() {
         type="button"
         onClick={() => {
           setIsLoading(true);
-          void subscribeToPush()
+          const action = isSubscribed ? unsubscribeFromPush() : subscribeToPush();
+          void action
             .catch(() => {
-              setError(t('pushNotification.enableError'));
+              setError(
+                isSubscribed
+                  ? t('pushNotification.disableError', { defaultValue: 'Unable to disable push notifications.' })
+                  : t('pushNotification.enableError'),
+              );
             })
             .finally(() => {
               setIsLoading(false);
