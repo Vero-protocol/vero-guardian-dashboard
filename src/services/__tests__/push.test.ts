@@ -7,6 +7,7 @@ import {
   decryptData,
   savePushSubscription,
   getPushSubscription,
+  deletePushSubscription,
 } from '../push';
 
 // ---------------------------------------------------------------------------
@@ -201,4 +202,37 @@ describe('push encryption', () => {
     expect(result).toBeNull();
     expect(localStorage.getItem('vero_push_subscriptions')).toBeNull();
   });
+
+  // --- deletePushSubscription -----------------------------------------------
+
+  test('deletePushSubscription clears localStorage and calls DELETE /api/push', async () => {
+    const sub = makeSub();
+    await savePushSubscription(sub);
+    expect(localStorage.getItem('vero_push_subscriptions')).not.toBeNull();
+
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = fetchMock as any;
+
+    const result = await deletePushSubscription();
+    expect(result).toBe(true);
+    expect(localStorage.getItem('vero_push_subscriptions')).toBeNull();
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/push?endpoint=${encodeURIComponent(sub.endpoint)}`,
+      { method: 'DELETE' },
+    );
+  });
+
+  test('deletePushSubscription accepts explicit endpoint parameter', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = fetchMock as any;
+
+    const explicitEndpoint = 'https://example.com/push/custom-endpoint';
+    const result = await deletePushSubscription(explicitEndpoint);
+    expect(result).toBe(true);
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/push?endpoint=${encodeURIComponent(explicitEndpoint)}`,
+      { method: 'DELETE' },
+    );
+  });
 });
+

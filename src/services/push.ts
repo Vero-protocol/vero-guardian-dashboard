@@ -245,6 +245,37 @@ export async function getPushSubscription(): Promise<PushSubscription | null> {
   }
 }
 
+export async function deletePushSubscription(endpoint?: string): Promise<boolean> {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  let targetEndpoint = endpoint;
+  if (!targetEndpoint) {
+    const current = await getPushSubscription();
+    targetEndpoint = current?.endpoint;
+  }
+
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Ignore storage failures
+  }
+
+  if (!targetEndpoint) {
+    return true;
+  }
+
+  try {
+    const response = await fetch(`/api/push?endpoint=${encodeURIComponent(targetEndpoint)}`, {
+      method: 'DELETE',
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function sendPushNotification(
   subscription: PushSubscription,
   notification: PushNotification,
