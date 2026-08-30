@@ -104,7 +104,8 @@ function getVoteButtonContent(state: VoteButtonState, t: TFunction): ReactElemen
   }
 }
 
-export default function VoteButton({ prId, publicKey }: VoteButtonProps): ReactElement {
+export default function VoteButton({
+   prId, publicKey }: VoteButtonProps): ReactElement {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const { canVote, isLoading: isRoleLoading } = useRole();
@@ -127,7 +128,9 @@ export default function VoteButton({ prId, publicKey }: VoteButtonProps): ReactE
   const voted = txState.status === 'success';
   const isPending = txState.status === 'pending';
   const hasPublicKey = Boolean(publicKey);
+
   const isRabet = activeProvider === 'rabet';
+
 
   const voteButtonState = getVoteButtonState(voted, isPending, isRoleLoading, hasPublicKey, canVote, isRabet);
   const isDisabled = voteButtonState !== 'ready';
@@ -151,9 +154,19 @@ export default function VoteButton({ prId, publicKey }: VoteButtonProps): ReactE
     if (result.status === 'success' && result.txHash) {
       const explorerUrl = getStellarExplorerTxUrl(result.txHash);
       showToast(
-        `${t('vote.toast.recorded')} — <a href="${explorerUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">tx ${result.txHash.slice(0, 8)}…</a>`,
-        'success',
-      );
+      <>
+        {t('vote.toast.recorded')} —{' '}
+        <a
+          href={explorerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
+          tx {result.txHash.slice(0, 8)}…
+        </a>
+      </>,
+      'success',
+    );
     }
   }
 
