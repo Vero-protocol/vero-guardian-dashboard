@@ -86,25 +86,31 @@ export function createHorizonTransactionStream(
 export function truncateMiddle(value: string, lead = 6, tail = 6): string {
   if (!value) return '';
   if (value.length <= lead + tail + 1) return value;
-  return `${value.slice(0, lead)}…${value.slice(-tail)}`;
+  return `\( {value.slice(0, lead)}… \){value.slice(-tail)}`;
 }
 
-const STATUS_STYLES: Record<FeedConnectionStatus, { labelKey: string; badge: string; dot: string; pulse: boolean }> = {
+const STATUS_STYLES: Record<
+  FeedConnectionStatus,
+  { labelKey: string; badge: string; dot: string; pulse: boolean }
+> = {
   connecting: {
     labelKey: 'transactionFeed.statusConnecting',
-    badge: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+    badge:
+      'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
     dot: 'bg-amber-500',
     pulse: true,
   },
   live: {
     labelKey: 'transactionFeed.statusLive',
-    badge: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
+    badge:
+      'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
     dot: 'bg-emerald-500',
     pulse: true,
   },
   error: {
     labelKey: 'transactionFeed.statusError',
-    badge: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400',
+    badge:
+      'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400',
     dot: 'bg-red-500',
     pulse: false,
   },
@@ -156,7 +162,11 @@ export default function TransactionFeed({
           actor: transaction.sourceAccount,
           resource: 'stellar.transaction',
           resourceId: transaction.hash,
-          metadata: { ledger: transaction.ledger, operationCount: transaction.operationCount, successful: transaction.successful },
+          metadata: {
+            ledger: transaction.ledger,
+            operationCount: transaction.operationCount,
+            successful: transaction.successful,
+          },
         });
         void auditAppender({
           id: `stellar-tx-${transaction.id}`,
@@ -184,7 +194,6 @@ export default function TransactionFeed({
       },
     });
 
-    // The stream connection is open once subscribed; surface it as live.
     if (active) {
       setStatus('live');
     }
@@ -202,70 +211,121 @@ export default function TransactionFeed({
       aria-label={t('transactionFeed.ariaLabel')}
       className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-lg"
     >
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
           <Radio className="w-5 h-5 text-sky-600 dark:text-sky-400" aria-hidden="true" />
           {t('transactionFeed.heading')}
         </h3>
+
         <div className="flex items-center gap-3">
           <ActivityLogExport />
+
+          {/* Connection status */}
           <span
             role="status"
             aria-live="polite"
+            aria-atomic="true"
             className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full border text-xs font-semibold ${statusStyle.badge}`}
           >
             <span
               data-testid="transaction-feed-status-dot"
-              className={`w-2 h-2 rounded-full ${statusStyle.dot} ${statusStyle.pulse ? 'animate-pulse' : ''}`}
+              className={`w-2 h-2 rounded-full ${statusStyle.dot} ${
+                statusStyle.pulse ? 'animate-pulse' : ''
+              }`}
+              aria-hidden="true"
             />
             {t(statusStyle.labelKey)}
           </span>
         </div>
       </div>
 
+      {/* Empty / Error state */}
       {transactions.length === 0 ? (
-        <p className="text-sm text-slate-500 dark:text-slate-400 py-8 text-center">
+        <p
+          className="text-sm text-slate-500 dark:text-slate-400 py-8 text-center"
+          role="status"
+          aria-live="polite"
+        >
           {status === 'error' ? t('transactionFeed.error') : t('transactionFeed.empty')}
         </p>
       ) : (
-        <ul className="space-y-2 max-h-96 overflow-y-auto" aria-live="polite">
-          {transactions.map((transaction) => (
-            <li
-              key={transaction.id}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 animate-in slide-in-from-top-2 fade-in"
-            >
-              {transaction.successful ? (
-                <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-label={t('transactionFeed.successful')} />
-              ) : (
-                <XCircle className="w-5 h-5 shrink-0 text-red-600 dark:text-red-400" aria-label={t('transactionFeed.failed')} />
-              )}
-              <div className="flex-1 min-w-0">
-                <a
-                  href={getStellarExplorerTxUrl(transaction.hash)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={t('transactionFeed.viewOnExplorer')}
-                  className="inline-flex items-center gap-1 font-mono text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
-                >
-                  {truncateMiddle(transaction.hash)}
-                  <ExternalLink className="w-3 h-3" aria-hidden="true" />
-                </a>
-                <p className="text-xs text-slate-500 dark:text-slate-400 truncate font-mono">
-                  {truncateMiddle(transaction.sourceAccount, 4, 4)}
-                </p>
-              </div>
-              <div className="text-right shrink-0">
-                <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  {t('transactionFeed.ledger', { ledger: transaction.ledger })}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {t('transactionFeed.operations', { count: transaction.operationCount })}
-                </p>
-              </div>
-            </li>
-          ))}
+        /* Transaction list */
+        <ul
+          className="space-y-2 max-h-96 overflow-y-auto"
+          aria-live="polite"
+          aria-label={t('transactionFeed.listLabel', {
+            defaultValue: 'Recent transactions',
+          })}
+        >
+          {transactions.map((transaction) => {
+            const statusText = transaction.successful
+              ? t('transactionFeed.successful')
+              : t('transactionFeed.failed');
+
+            const itemLabel = `${statusText}. Transaction ${truncateMiddle(
+              transaction.hash,
+            )}. From ${truncateMiddle(transaction.sourceAccount, 4, 4)}. Ledger ${
+              transaction.ledger
+            }. ${transaction.operationCount} operations.`;
+
+            return (
+              <li
+                key={transaction.id}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 animate-in slide-in-from-top-2 fade-in"
+              >
+                {/* Status icon */}
+                {transaction.successful ? (
+                  <CheckCircle2
+                    className="w-5 h-5 shrink-0 text-emerald-600 dark:text-emerald-400"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <XCircle
+                    className="w-5 h-5 shrink-0 text-red-600 dark:text-red-400"
+                    aria-hidden="true"
+                  />
+                )}
+
+                {/* Main content */}
+                <div className="flex-1 min-w-0">
+                  <a
+                    href={getStellarExplorerTxUrl(transaction.hash)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${t('transactionFeed.viewOnExplorer')}: ${truncateMiddle(
+                      transaction.hash,
+                    )}`}
+                    className="inline-flex items-center gap-1 font-mono text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 rounded"
+                  >
+                    {truncateMiddle(transaction.hash)}
+                    <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                  </a>
+
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate font-mono">
+                    {truncateMiddle(transaction.sourceAccount, 4, 4)}
+                  </p>
+                </div>
+
+                {/* Meta info */}
+                <div className="text-right shrink-0">
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {t('transactionFeed.ledger', { ledger: transaction.ledger })}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {t('transactionFeed.operations', {
+                      count: transaction.operationCount,
+                    })}
+                  </p>
+                </div>
+
+                {/* Screen reader only full description */}
+                <span className="sr-only">{itemLabel}</span>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>
   );
-}
+      }
