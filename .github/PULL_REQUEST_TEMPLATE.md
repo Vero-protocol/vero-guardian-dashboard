@@ -8,7 +8,17 @@ Closes #
 
 ## Summary
 
-<!-- Briefly describe the change and why it is needed. Keep it to one or two sentences. -->
+<!--
+Describe what changed and why, in enough detail that a reviewer who has NOT read
+the issue can follow it. A single line is not enough — PRs with a one-line
+description will be sent back.
+
+Cover:
+  - The problem this solves, and what the behaviour was before
+  - The approach you took, and any alternative you considered and rejected
+  - Anything the reviewer should look at closely, or that you are unsure about
+  - How you verified it (tests added, commands run, manual checks)
+-->
 
 ## Changes made
 
