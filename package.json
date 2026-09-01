@@ -23,7 +23,7 @@
     "d3-scale": "^4.0.2",
     "d3-scale-chromatic": "^3.1.0",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.6.2",
+    "express-rate-limit": "^8.7.0",
     "gridstack": "^13.2.0",
     "i18next": "^26.4.0",
     "jspdf": "^4.2.1",
