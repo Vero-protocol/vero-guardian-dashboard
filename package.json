@@ -19,7 +19,7 @@
     "@stellar/freighter-api": "^6.0.1",
     "@stellar/stellar-sdk": "^11.3.0",
     "clsx": "^2.1.1",
-    "cytoscape": "^3.34.1",
+    "cytoscape": "^3.34.2",
     "d3-scale": "^4.0.2",
     "d3-scale-chromatic": "^3.1.0",
     "express": "^5.2.1",
