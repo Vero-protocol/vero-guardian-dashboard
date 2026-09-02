@@ -162,9 +162,19 @@ export default function EmergencyHaltButton(): ReactElement {
 
       const explorerUrl = getStellarExplorerTxUrl(hash);
       showToast(
-        `${t('emergencyHalt.toast.halted')} — <a href="${explorerUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">tx ${hash.slice(0, 8)}…</a>`,
-        'success',
-      );
+      <>
+        {t('emergencyHalt.toast.halted')} —{' '}
+        <a
+          href={explorerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
+          tx {hash.slice(0, 8)}…
+        </a>
+      </>,
+      'success',
+    );
     } catch (err) {
       const message = err instanceof Error ? err.message : t('emergencyHalt.toast.failed');
       emitEvent({ type: 'emergency_halt', actor: publicKey, resource: 'contract', resourceId: CONTRACT_ID, metadata: { error: message } });

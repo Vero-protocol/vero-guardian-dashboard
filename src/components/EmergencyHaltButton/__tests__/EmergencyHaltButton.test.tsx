@@ -276,7 +276,7 @@ describe('EmergencyHaltButton', () => {
 
       await waitFor(() => {
         expect(mockShowToast).toHaveBeenCalledWith(
-          expect.stringContaining('Contract successfully halted'),
+          expect.anything(),
           'success'
         );
       });

@@ -33,3 +33,10 @@ If applicable, add screenshots or console/network logs to help explain your prob
 
 **Additional context**
 Add any other context about the problem here.
+
+---
+
+**If you pick this issue up:** the pull request that closes it needs a **detailed
+description** — what was wrong, the approach you took, anything the reviewer
+should look at closely, and how you verified it. A one-line description will be
+sent back before review. See CONTRIBUTING.md.

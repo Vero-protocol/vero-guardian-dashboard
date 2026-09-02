@@ -1,0 +1,29 @@
+# CODEOWNERS
+#
+# Per-path review ownership for vero-guardian-dashboard.
+#
+# There is no per-module maintainer subdivision yet, so every path
+# defaults to the two current org maintainers (@N-thnI @N-i-xx)
+# rather than leaving paths unassigned. The explicit entries below
+# make ownership visible and easy to tighten per-module later.
+
+# Global default: both org maintainers own everything.
+* @N-thnI @N-i-xx
+
+# ── Security-sensitive: wallet identity & session state ────────────
+src/auth/                       @N-thnI @N-i-xx
+src/context/WalletContext.tsx   @N-thnI @N-i-xx
+src/components/security/        @N-thnI @N-i-xx
+
+# ── Transaction construction: what users are asked to sign ─────────
+src/services/txBuilder.ts       @N-thnI @N-i-xx
+src/components/BatchTxBuilder/  @N-thnI @N-i-xx
+
+# ── Service layer & network access ─────────────────────────────────
+src/services/                   @N-thnI @N-i-xx
+
+# ── CI, supply chain & repository configuration ────────────────────
+.github/                        @N-thnI @N-i-xx
+package.json                    @N-thnI @N-i-xx
+package-lock.json               @N-thnI @N-i-xx
+next.config.js                  @N-thnI @N-i-xx
