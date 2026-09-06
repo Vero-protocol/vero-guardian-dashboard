@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { castVote } from '@/services/contractClient';
+import type { VoteChoice } from '@/services/contractClient';
 import { appendAuditEvent } from '@/utils/logger';
 
 export type VoteTxStatus = 'idle' | 'pending' | 'success' | 'error';
@@ -43,6 +44,8 @@ export interface UseVoteTransactionOptions {
   providerId?: import('@/lib/wallets').WalletProviderId;
   horizonUrl: string;
   networkPassphrase: string;
+  /** Vote direction — defaults to 'approve' until the UI exposes reject. */
+  choice?: VoteChoice;
 }
 
 export interface UseVoteTransactionResult {
@@ -64,6 +67,7 @@ export function useVoteTransaction({
   providerId,
   horizonUrl,
   networkPassphrase,
+  choice = 'approve',
 }: UseVoteTransactionOptions): UseVoteTransactionResult {
   const [state, setState] = useState<VoteTxState>(IDLE_STATE);
 
@@ -71,7 +75,7 @@ export function useVoteTransaction({
     setState({ status: 'pending', txHash: null, errorKind: null, errorMessage: null });
 
     try {
-      const hash = await castVote(prId, publicKey, horizonUrl, networkPassphrase, providerId);
+      const hash = await castVote(prId, publicKey, horizonUrl, networkPassphrase, providerId, choice);
       const next: VoteTxState = { status: 'success', txHash: hash, errorKind: null, errorMessage: null };
       setState(next);
 
@@ -83,7 +87,7 @@ export function useVoteTransaction({
         resource: 'pull_request',
         resourceId: prId,
         status: 'success',
-        metadata: { transactionHash: hash },
+        metadata: { transactionHash: hash, choice },
       }).catch((err) => console.error('Unable to append vote audit log', err));
 
       return next;
@@ -100,12 +104,12 @@ export function useVoteTransaction({
         resource: 'pull_request',
         resourceId: prId,
         status: 'failure',
-        metadata: { error: message, errorKind },
+        metadata: { error: message, errorKind, choice },
       }).catch((e) => console.error('Unable to append failed vote audit log', e));
 
       return next;
     }
-  }, [prId, publicKey, horizonUrl, networkPassphrase, providerId]);
+  }, [prId, publicKey, horizonUrl, networkPassphrase, providerId, choice]);
 
   const reset = useCallback(() => setState(IDLE_STATE), []);
 

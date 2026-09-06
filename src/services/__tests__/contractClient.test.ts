@@ -17,14 +17,20 @@ jest.mock('@stellar/stellar-sdk', () => {
   const ServerMock = jest.fn(() => server);
   (ServerMock as any).__mockServer = server;
 
-  // Chainable TransactionBuilder mock
+  // Capture the operation passed to addOperation so tests can inspect it.
+  const capturedOps: any[] = [];
   const txMock = {
-    addOperation: jest.fn().mockReturnThis(),
+    addOperation: jest.fn((op: any) => {
+      capturedOps.push(op);
+      return txMock;
+    }),
     setTimeout: jest.fn().mockReturnThis(),
     build: jest.fn().mockReturnValue({ toXDR: jest.fn().mockReturnValue('xdr') }),
+    __capturedOps: capturedOps,
   };
   const TransactionBuilder = jest.fn(() => txMock);
   (TransactionBuilder as any).fromXDR = jest.fn(() => ({}));
+  (TransactionBuilder as any).__txMock = txMock;
 
   return {
     ...original,
@@ -41,7 +47,7 @@ jest.mock('@/lib/wallets', () => {
   };
 });
 
-import { castVote } from '@/services/contractClient';
+import { castVote, parseConsensusData } from '@/services/contractClient';
 import { getWalletProvider } from '@/lib/wallets';
 import * as StellarSdk from '@stellar/stellar-sdk';
 
@@ -49,6 +55,11 @@ import * as StellarSdk from '@stellar/stellar-sdk';
 const mockServer = (StellarSdk.Horizon.Server as any).__mockServer as {
   loadAccount: jest.Mock;
   submitTransaction: jest.Mock;
+};
+
+const mockTxBuilder = (StellarSdk.TransactionBuilder as any).__txMock as {
+  addOperation: jest.Mock;
+  __capturedOps: any[];
 };
 
 const mockGetWalletProvider = getWalletProvider as jest.Mock;
@@ -75,6 +86,7 @@ describe('castVote', () => {
     mockServer.submitTransaction.mockResolvedValue({ hash: TX_HASH });
     mockProvider.signTransaction.mockResolvedValue('signedXDR');
     mockGetWalletProvider.mockReturnValue(mockProvider);
+    mockTxBuilder.__capturedOps.length = 0;
   });
 
   afterEach(() => {
@@ -110,6 +122,30 @@ describe('castVote', () => {
     expect(mockServer.submitTransaction).toHaveBeenCalled();
   });
 
+  it('writes the approve key and numeric weight by default', async () => {
+    await castVote(42, PUBLIC_KEY);
+    expect(mockTxBuilder.__capturedOps).toHaveLength(1);
+    expect(mockTxBuilder.__capturedOps[0]).toMatchObject({
+      name: 'vote_42_approve',
+      value: '1',
+    });
+  });
+
+  it('writes the reject key when choice is reject', async () => {
+    await castVote(42, PUBLIC_KEY, undefined, undefined, 'freighter', 'reject');
+    expect(mockTxBuilder.__capturedOps).toHaveLength(1);
+    expect(mockTxBuilder.__capturedOps[0]).toMatchObject({
+      name: 'vote_42_reject',
+      value: '1',
+    });
+  });
+
+  it('throws on an invalid vote choice', async () => {
+    await expect(castVote(42, PUBLIC_KEY, undefined, undefined, 'freighter', 'maybe' as any)).rejects.toThrow(
+      /Invalid vote choice/
+    );
+  });
+
   it('propagates Horizon submission errors', async () => {
     mockServer.submitTransaction.mockRejectedValue(new Error('Horizon error'));
     await expect(castVote(42, PUBLIC_KEY)).rejects.toThrow('Horizon error');
@@ -118,5 +154,77 @@ describe('castVote', () => {
   it('propagates signing errors', async () => {
     mockProvider.signTransaction.mockRejectedValue(new Error('User rejected'));
     await expect(castVote(42, PUBLIC_KEY)).rejects.toThrow('User rejected');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseConsensusData
+// ---------------------------------------------------------------------------
+
+describe('parseConsensusData', () => {
+  const encode = (value: string): string => Buffer.from(value).toString('base64');
+
+  it('returns zero weights when dataAttr is missing', () => {
+    expect(parseConsensusData(undefined, '42')).toEqual({
+      currentWeight: 0,
+      threshold: 51,
+      approveWeight: 0,
+      rejectWeight: 0,
+    });
+  });
+
+  it('reads the exact key/value shape castVote produces for approve', () => {
+    const dataAttr: Record<string, string> = {
+      consensus_threshold: encode('100'),
+      vote_42_approve: encode('1'),
+    };
+
+    expect(parseConsensusData(dataAttr, '42')).toEqual({
+      currentWeight: 1,
+      threshold: 100,
+      approveWeight: 1,
+      rejectWeight: 0,
+    });
+  });
+
+  it('reads reject votes separately from approve votes', () => {
+    const dataAttr: Record<string, string> = {
+      consensus_threshold: encode('100'),
+      vote_42_approve: encode('3'),
+      vote_42_reject: encode('2'),
+    };
+
+    expect(parseConsensusData(dataAttr, '42')).toEqual({
+      currentWeight: 5,
+      threshold: 100,
+      approveWeight: 3,
+      rejectWeight: 2,
+    });
+  });
+
+  it('trims whitespace from the taskId', () => {
+    const dataAttr: Record<string, string> = {
+      vote_42_approve: encode('7'),
+    };
+
+    expect(parseConsensusData(dataAttr, '  42  ')).toEqual({
+      currentWeight: 7,
+      threshold: 51,
+      approveWeight: 7,
+      rejectWeight: 0,
+    });
+  });
+
+  it('ignores malformed numeric values gracefully', () => {
+    const dataAttr: Record<string, string> = {
+      vote_42_approve: encode('not-a-number'),
+    };
+
+    expect(parseConsensusData(dataAttr, '42')).toEqual({
+      currentWeight: 0,
+      threshold: 51,
+      approveWeight: 0,
+      rejectWeight: 0,
+    });
   });
 });
