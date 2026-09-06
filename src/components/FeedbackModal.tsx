@@ -2,11 +2,11 @@
 
 import type { FormEvent, ReactElement } from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MessageSquare, Send, X } from 'lucide-react';
 
 type SubmissionState = 'idle' | 'submitting' | 'success' | 'error';
 
-const ratings = ['Excellent', 'Good', 'Needs work'];
 
 function sanitizeInput(value: string): string {
   // Re-apply until the string stops changing so nested/overlapping tags
@@ -21,10 +21,12 @@ function sanitizeInput(value: string): string {
 }
 
 export default function FeedbackModal(): ReactElement {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [rating, setRating] = useState(ratings[1]);
+  const ratings = [t('feedback.excellent', 'Excellent'), t('feedback.good', 'Good'), t('feedback.needsWork', 'Needs work')];
+  const [rating, setRating] = useState(() => [t('feedback.excellent', 'Excellent'), t('feedback.good', 'Good'), t('feedback.needsWork', 'Needs work')][1]);
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<SubmissionState>('idle');
   const [error, setError] = useState('');
@@ -47,8 +49,8 @@ export default function FeedbackModal(): ReactElement {
     });
 
     if (!response.ok) {
-      const payload = await response.json().catch(() => ({ error: 'Feedback could not be sent.' }));
-      setError(payload.error ?? 'Feedback could not be sent.');
+      const payload = await response.json().catch(() => ({ error: t('feedback.sendError', 'Feedback could not be sent.') }));
+      setError(payload.error ?? t('feedback.sendError', 'Feedback could not be sent.'));
       setStatus('error');
       return;
     }

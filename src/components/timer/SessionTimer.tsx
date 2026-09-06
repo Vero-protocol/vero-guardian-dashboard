@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, Pause, Play, RotateCcw, Timer as TimerIcon } from 'lucide-react';
 
 export const DEFAULT_SESSION_SECONDS = 25 * 60;
@@ -31,6 +32,7 @@ export default function SessionTimer({
   now = Date.now,
   onSessionComplete,
 }: SessionTimerProps) {
+  const { t } = useTranslation();
   const sessionDurationMs = Math.max(1, durationSeconds) * 1_000;
   const [remainingMs, setRemainingMs] = useState(sessionDurationMs);
   const [status, setStatus] = useState<TimerStatus>('idle');
@@ -105,7 +107,7 @@ export default function SessionTimer({
   const remainingSeconds = remainingMs / 1_000;
   const progress = Math.min(100, Math.max(0, ((sessionDurationMs - remainingMs) / sessionDurationMs) * 100));
   const isRunning = status === 'running';
-  const primaryLabel = status === 'paused' ? 'Resume audit' : status === 'completed' ? 'Start another audit' : 'Start audit';
+  const primaryLabel = status === 'paused' ? t('sessionTimer.resume', 'Resume audit') : status === 'completed' ? t('sessionTimer.startAnother', 'Start another audit') : t('sessionTimer.start', 'Start audit');
   const totalAuditedSeconds = sessions.reduce((total, session) => total + session.durationSeconds, 0);
 
   return (
@@ -130,10 +132,10 @@ export default function SessionTimer({
           {formatAuditTime(remainingSeconds)}
         </p>
         <p className="mt-2 text-sm font-medium text-violet-700 dark:text-violet-300">
-          {status === 'running' && 'Focus session in progress'}
-          {status === 'paused' && 'Session paused'}
-          {status === 'idle' && 'Ready for a focused audit'}
-          {status === 'completed' && 'Session complete — time recorded'}
+          {status === 'running' && t('sessionTimer.inProgress', 'Focus session in progress')}
+          {status === 'paused' && t('sessionTimer.paused', 'Session paused')}
+          {status === 'idle' && t('sessionTimer.ready', 'Ready for a focused audit')}
+          {status === 'completed' && t('sessionTimer.completed', 'Session complete — time recorded')}
         </p>
         <div
           className="mt-4 h-2 overflow-hidden rounded-full bg-violet-100 dark:bg-violet-950"
@@ -157,7 +159,7 @@ export default function SessionTimer({
           className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
         >
           {isRunning ? <Pause className="h-4 w-4" aria-hidden="true" /> : <Play className="h-4 w-4" aria-hidden="true" />}
-          {isRunning ? 'Pause audit' : primaryLabel}
+          {isRunning ? t('sessionTimer.pause', 'Pause audit') : primaryLabel}
         </button>
         <button
           type="button"
