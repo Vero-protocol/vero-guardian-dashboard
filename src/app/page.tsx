@@ -40,6 +40,7 @@ import { AccessControl } from "@/components/Guard";
 import SessionTimer from "@/components/timer";
 import { useRole } from "@/context/RoleContext";
 import { useWallet } from "@/context/WalletContext";
+import { useAlerts } from "@/context/AlertContext";
 import { AlertBanner } from "@/components/AlertBanner";
 import type { UserRole } from "@/services/roleClient";
 
@@ -124,6 +125,7 @@ export default function Home(): ReactElement {
   const { isConnected, reputation } = useWallet();
   const { role, isLoading: isRoleLoading } = useRole();
   const roleLabel = getRoleLabel(role, isRoleLoading, t);
+  const { addAlert } = useAlerts();
   const roleHelperText = getRoleHelperText(role, isConnected, isRoleLoading, t);
   const welcomeTitle = getWelcomeTitle(
     isConnected,
@@ -196,6 +198,10 @@ export default function Home(): ReactElement {
               <button
                 className="w-full flex items-center justify-between px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors group focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 aria-label={t("actions.networkStatus")}
+                onClick={() => {
+                  const el = document.getElementById("network-status-footer");
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
               >
                 <span className="font-medium">
                   {t("actions.networkStatus")}
@@ -208,6 +214,15 @@ export default function Home(): ReactElement {
               <button
                 className="w-full flex items-center justify-between px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors group focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 aria-label={t("actions.stake")}
+                onClick={() =>
+                  addAlert({
+                    type: "info",
+                    title: t("actions.comingSoonTitle", { defaultValue: "Coming Soon" }),
+                    message: t("actions.stakeComingSoon", { defaultValue: "Staking will be available in a future release." }),
+                    source: "quick-actions",
+                    dismissable: true,
+                  })
+                }
               >
                 <span className="font-medium">{t("actions.stake")}</span>
                 <ArrowRight
@@ -218,6 +233,15 @@ export default function Home(): ReactElement {
               <button
                 className="w-full flex items-center justify-between px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors group focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 aria-label={t("actions.rewards")}
+                onClick={() =>
+                  addAlert({
+                    type: "info",
+                    title: t("actions.comingSoonTitle", { defaultValue: "Coming Soon" }),
+                    message: t("actions.rewardsComingSoon", { defaultValue: "Rewards will be available in a future release." }),
+                    source: "quick-actions",
+                    dismissable: true,
+                  })
+                }
               >
                 <span className="font-medium">{t("actions.rewards")}</span>
                 <ArrowRight
@@ -507,7 +531,9 @@ export default function Home(): ReactElement {
       <footer className="border-t border-slate-200 dark:border-slate-800 mt-12 bg-white dark:bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="flex flex-col gap-6">
-            <NetworkStatus />
+            <div id="network-status-footer">
+              <NetworkStatus />
+            </div>
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-sm text-slate-600 dark:text-slate-500">
                 {t("app.footerCopyright")}
