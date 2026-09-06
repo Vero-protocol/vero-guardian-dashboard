@@ -28,6 +28,7 @@ function AlertIcon({ type }: { type: AlertType }) {
 }
 
 export function AlertBanner() {
+  const { t } = useTranslation();
   const { alerts, dismissAlert } = useAlerts();
 
   const active = alerts.length === 0
@@ -56,7 +57,7 @@ export function AlertBanner() {
       {active.dismissable && (
         <button
           onClick={() => dismissAlert(active.id)}
-          aria-label="Dismiss alert"
+          aria-label={t("alert.dismiss", { defaultValue: "Dismiss alert" })}
           className="shrink-0 opacity-70 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded p-0.5"
         >
           <X className="w-4 h-4" aria-hidden="true" />

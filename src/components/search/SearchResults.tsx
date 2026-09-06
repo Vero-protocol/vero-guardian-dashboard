@@ -5,6 +5,7 @@
  * Displays ranked search results with contract and function details
  */
 
+import { useTranslation } from 'react-i18next';
 import { Badge } from 'lucide-react';
 import type { RankedSearchResult } from './types';
 
@@ -58,6 +59,7 @@ export function SearchResults({
   results,
   isLoading = false,
   isEmpty = false,
+  const { t } = useTranslation();
   onResultClick,
   maxHeight = '400px',
   showRank = true,
@@ -75,7 +77,7 @@ export function SearchResults({
     return (
       <div className="rounded-lg border border-slate-200 bg-slate-50 px-6 py-8 text-center dark:border-slate-700 dark:bg-slate-900/30">
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-          {isEmpty ? 'No search query' : 'No results found'}
+          {isEmpty ? t("search.noQuery", { defaultValue: "No search query" }) : t("search.noResults", { defaultValue: "No results found" })}
         </p>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           {isEmpty
