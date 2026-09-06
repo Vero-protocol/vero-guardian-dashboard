@@ -44,6 +44,14 @@ describe('useVoteTransaction', () => {
       errorMessage: null,
     });
     expect(result.current.state).toEqual(returnedState);
+    expect(mockCastVote).toHaveBeenCalledWith(
+      OPTS.prId,
+      OPTS.publicKey,
+      OPTS.horizonUrl,
+      OPTS.networkPassphrase,
+      undefined,
+      'approve',
+    );
     expect(appendAuditEvent).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'vote_submitted', status: 'success' }),
     );
