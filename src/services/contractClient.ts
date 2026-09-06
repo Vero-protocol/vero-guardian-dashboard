@@ -178,14 +178,15 @@ export async function haltContract(
     throw new Error(simulation.error);
   }
 
-  const preparedTx = StellarSdk.SorobanRpc.assembleTransaction(rawTx, simulation) as any;
+  const preparedTx = StellarSdk.SorobanRpc.assembleTransaction(rawTx, simulation) as StellarSdk.TransactionBuilder;
+  const builtTx = preparedTx.build();
 
   const provider = getWalletProvider(providerId);
   if (!provider.signTransaction) {
     throw new Error(`Wallet provider ${providerId} does not support signing`);
   }
 
-  const signedXdr = await provider.signTransaction(preparedTx.toXDR(), { networkPassphrase });
+  const signedXdr = await provider.signTransaction(builtTx.toXDR(), { networkPassphrase });
 
   const signedTx = StellarSdk.TransactionBuilder.fromXDR(
     signedXdr,
