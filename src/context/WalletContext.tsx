@@ -22,6 +22,7 @@ import {
   type WalletProviderInfo,
 } from '@/lib/wallets';
 import { getReputation } from '@/lib/stellar-interact';
+import { useNetwork } from '@/context/NetworkContext';
 import { useChainState } from '@/hooks/useChainState';
 import { useEvents } from '@/hooks/useEvents';
 import { getSessionItem, removeSessionItem, setSessionItem, sessionManager } from '@/auth/session';
@@ -79,6 +80,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     cacheKeys: publicKey ? [`account:${publicKey}`, `reputation:${publicKey}`] : ['wallet'],
   });
   const { emit } = useEvents();
+  const { networkConfig } = useNetwork();
 
   // Detect installed wallet extensions once on the client.
   useEffect(() => {
@@ -200,7 +202,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     async function refreshReputation() {
       try {
-        const nextReputation = await getReputation(currentPublicKey);
+        const nextReputation = await getReputation(currentPublicKey, networkConfig.horizonUrl);
         if (reputationRequestIdRef.current === requestId) {
           setReputation(nextReputation);
         }

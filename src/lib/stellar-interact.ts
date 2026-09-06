@@ -11,7 +11,9 @@ function decodeBase64(value: string): string {
 }
 
 /** Fetch Guardian reputation score from contract data entries. */
-export async function getReputation(publicKey: string): Promise<number> {
+export async function getReputation(publicKey: string, horizonUrl?: string): Promise<number> {
+  const serverUrl = horizonUrl ?? HORIZON_URL;
+  const server = new StellarSdk.Horizon.Server(serverUrl);
   const account = await server.loadAccount(publicKey);
   const entry = (account.data_attr as Record<string, string>)['vero_reputation'];
   if (!entry) {
