@@ -6,6 +6,6 @@
 export function getStellarExplorerTxUrl(hash: string): string {
   if (!hash || typeof hash !== 'string') return '';
   // Ensure hash is trimmed and lowercased for consistency
-  const cleanHash = hash.trim();
+  const cleanHash = hash.trim().toLowerCase();
   return `https://stellar.expert/explorer/public/tx/${cleanHash}`;
 }
