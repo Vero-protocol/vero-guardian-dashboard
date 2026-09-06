@@ -22,6 +22,7 @@ describe('security headers', () => {
     expect(byKey['Content-Security-Policy']).toContain('connect-src');
     expect(byKey['Content-Security-Policy']).toContain('https://horizon-testnet.stellar.org');
     expect(byKey['Content-Security-Policy']).toContain('https://soroban-testnet.stellar.org');
+    expect(byKey['Content-Security-Policy']).toContain("frame-src 'none'");
     expect(byKey['Content-Security-Policy']).toContain("frame-ancestors 'none'");
     expect(byKey['X-Content-Type-Options']).toBe('nosniff');
     expect(byKey['X-Frame-Options']).toBe('DENY');
@@ -36,5 +37,18 @@ describe('security headers', () => {
 
     expect(csp).toContain('https://horizon.example.com');
     expect(csp).toContain('https://soroban.example.com');
+  });
+
+  it('uses a nonce in script-src and drops unsafe-inline when a nonce is supplied', () => {
+    const csp = getSecurityHeaders('abc123').find((h) => h.key === 'Content-Security-Policy').value;
+
+    expect(csp).toContain("script-src 'self' 'nonce-abc123'");
+    expect(csp).not.toContain("'unsafe-inline'");
+  });
+
+  it('falls back to unsafe-inline in script-src when no nonce is supplied', () => {
+    const csp = getSecurityHeaders().find((h) => h.key === 'Content-Security-Policy').value;
+
+    expect(csp).toContain("script-src 'self' 'unsafe-inline'");
   });
 });

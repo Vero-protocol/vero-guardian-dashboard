@@ -256,7 +256,7 @@ function Leaderboard(): ReactElement {
           const container = document.getElementById(`avatar-${id}`);
           if (!container) continue;
           // Clear existing
-          container.innerHTML = '';
+          container.replaceChildren();
           if (p?.avatarUrl) {
             const img = document.createElement('img');
             img.src = p.avatarUrl;

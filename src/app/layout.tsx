@@ -1,5 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { Inter } from 'next/font/google';
 import type { ReactElement, ReactNode } from 'react';
 import { WalletProvider } from '@/context/WalletContext';
@@ -24,7 +25,11 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps): ReactElement {
+export default async function RootLayout({ children }: RootLayoutProps): Promise<ReactElement> {
+  // The middleware sets a per-request nonce so the anti-flicker theme script
+  // can be whitelisted in the CSP without keeping 'unsafe-inline' enabled.
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+
   return (
     <html lang="en" className={inter.className} suppressHydrationWarning>
       <head>
@@ -32,7 +37,7 @@ export default function RootLayout({ children }: RootLayoutProps): ReactElement 
           Anti-flicker script: runs synchronously before first paint to apply
           the correct dark/light class from localStorage, preventing theme flash.
         */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200">
         <I18nProvider>
