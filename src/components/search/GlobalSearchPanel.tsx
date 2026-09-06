@@ -11,6 +11,7 @@ import { ChevronDown, RefreshCw } from 'lucide-react';
 import { SearchInput } from './SearchInput';
 import { SearchResults } from './SearchResults';
 import type { RankedSearchResult, SearchOptions } from './types';
+import { useTranslation } from 'react-i18next';
 import { useSearchIndex } from './useSearchIndex';
 import type { ContractMetadata } from './types';
 
@@ -34,9 +35,10 @@ export function GlobalSearchPanel({
   maxResults = 10,
   minScore = 20,
   debounceMs = 300,
-  placeholder = 'Search contracts, functions, or on-chain data...',
+  placeholder = t("search.placeholder", { defaultValue: "Search contracts, functions, or on-chain data..." }),
   storageKey = 'search-index-contracts',
 }: GlobalSearchPanelProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<ContractMetadata['type'][]>([]);

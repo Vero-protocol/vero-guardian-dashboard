@@ -24,7 +24,7 @@ export interface SearchInputProps {
 export function SearchInput({
   value,
   onChange,
-  placeholder = 'Search contracts, functions, or on-chain data...',
+  placeholder = t("search.placeholder", { defaultValue: "Search contracts, functions, or on-chain data..." }),
   isLoading = false,
   error = null,
   onFocus,
@@ -33,6 +33,7 @@ export function SearchInput({
   autoFocus = false,
   ariaLabel = 'Search on-chain state',
 }: SearchInputProps) {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [hasError, setHasError] = useState(false);
 
