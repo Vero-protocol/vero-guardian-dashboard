@@ -13,21 +13,44 @@ import { createRateLimiter } from '@/lib/rate-limit';
 // to prevent enumeration probing.
 const rateLimiter = createRateLimiter({ limit: 10 });
 
+function isAuthorized(request: Request): boolean {
+  const secret = process.env.VERO_API_SECRET;
+  // When no secret is configured (local development), allow the request.
+  if (!secret) return true;
+  const auth = request.headers.get('authorization') ?? '';
+  return auth === `Bearer ${secret}`;
+}
+
+function safeError(message = 'Internal server error.', status = 500, logError?: unknown) {
+  if (logError !== undefined) {
+    console.error('[vault]', logError);
+  }
+  return NextResponse.json({ error: message }, { status });
+}
+
 export async function GET(request: Request) {
   const limited = rateLimiter(request);
   if (limited) return limited;
 
+  if (!isAuthorized(request)) {
+    return safeError('Unauthorized.', 401);
+  }
+
   try {
     const status = getVaultSecretStatus('STELLAR_SECRET_KEY');
     return NextResponse.json(status);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return safeError('Unable to read vault status.', 500, error);
   }
 }
 
 export async function POST(request: Request) {
   const limited = rateLimiter(request);
   if (limited) return limited;
+
+  if (!isAuthorized(request)) {
+    return safeError('Unauthorized.', 401);
+  }
 
   try {
     const body = await request.json();
@@ -36,7 +59,7 @@ export async function POST(request: Request) {
     if (action === 'encrypt') {
       const { secret, keyId, hardwareBacked, keyMaterial } = body;
       if (!secret || !keyId || !keyMaterial) {
-        return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+        return safeError('Missing required parameters.', 400);
       }
 
       const store = new MemoryVaultStore();
@@ -57,7 +80,7 @@ export async function POST(request: Request) {
     if (action === 'verify') {
       const { record, keyMaterial } = body;
       if (!record || !keyMaterial) {
-        return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+        return safeError('Missing required parameters.', 400);
       }
 
       const store = new MemoryVaultStore();
@@ -86,8 +109,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: verified, length });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return safeError('Invalid action.', 400);
+  } catch (error) {
+    return safeError('Vault operation failed.', 500, error);
   }
 }
