@@ -49,11 +49,13 @@ describe('fetchUserRole', () => {
 
   beforeEach(() => {
     delete process.env.NEXT_PUBLIC_ROLE_REGISTRY_ACCOUNT;
+    process.env.NEXT_PUBLIC_ALLOW_SELF_REGISTRY = 'true';
     mockFetch.mockReset();
   });
 
   afterEach(() => {
     delete process.env.NEXT_PUBLIC_ROLE_REGISTRY_ACCOUNT;
+    delete process.env.NEXT_PUBLIC_ALLOW_SELF_REGISTRY;
   });
 
   afterAll(() => {

@@ -286,8 +286,13 @@ NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
 # Stellar Horizon REST API
 NEXT_PUBLIC_HORIZON_URL=https://horizon-testnet.stellar.org
 
-# Optional Horizon account that stores admin/guardian role map entries
+# Horizon account that stores admin/guardian role map entries. 
+# If left blank, you MUST set NEXT_PUBLIC_ALLOW_SELF_REGISTRY=true to enable self-registry fallback,
+# which is INSECURE for production as anyone can grant themselves admin privileges.
 NEXT_PUBLIC_ROLE_REGISTRY_ACCOUNT=G...
+
+# Explicitly opt-in to allowing wallets to self-grant roles. DANGEROUS in production!
+# NEXT_PUBLIC_ALLOW_SELF_REGISTRY=true
 
 # Optional Guardian profile service base URL
 NEXT_PUBLIC_PROFILE_SERVICE_URL=
@@ -314,7 +319,8 @@ GITHUB_WEBHOOK_SECRET=
 Variable	Description	Default
 NEXT_PUBLIC_SOROBAN_RPC_URL	Soroban RPC endpoint	https://soroban-testnet.stellar.org
 NEXT_PUBLIC_HORIZON_URL	Stellar Horizon REST API	https://horizon-testnet.stellar.org
-NEXT_PUBLIC_ROLE_REGISTRY_ACCOUNT	Optional Horizon account containing admin/guardian role map entries	connected wallet account
+NEXT_PUBLIC_ROLE_REGISTRY_ACCOUNT	Optional Horizon account containing admin/guardian role map entries	None
+NEXT_PUBLIC_ALLOW_SELF_REGISTRY	Allows connected wallets to self-grant roles when registry account is unset. DANGEROUS in production.	false
 STELLAR_NETWORK	testnet or mainnet	testnet
 RELAYER_VAULT_KEY_PROVIDER	Hardware-backed vault key provider identifier	hardware
 RELAYER_VAULT_HARDWARE_BACKED	Must be true when relayer vault keys are backed by OS/HSM storage	—
