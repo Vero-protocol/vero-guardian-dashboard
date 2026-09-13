@@ -176,3 +176,14 @@ export function useNetwork(): NetworkContextType {
   }
   return context;
 }
+
+/**
+ * Returns the active NetworkContext, or undefined when called outside NetworkProvider.
+ * Safe for components/providers that can function with defaults when NetworkProvider is omitted.
+ */
+export function useOptionalNetwork(): NetworkContextType | undefined {
+  return useContext(NetworkContext);
+}
+
+export { NetworkContext };
+
