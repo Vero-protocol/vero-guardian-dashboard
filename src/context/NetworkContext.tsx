@@ -169,10 +169,21 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const defaultNetworkContextValue: NetworkContextType = {
+  networkConfig: defaultNetworkConfig,
+  isCustomConfig: false,
+  urlError: null,
+  clearUrlError: () => {},
+  setHorizonUrl: () => false,
+  setSorobanRpcUrl: () => false,
+  setNetworkPassphrase: () => {},
+  resetToDefaults: () => {},
+};
+
 export function useNetwork(): NetworkContextType {
   const context = useContext(NetworkContext);
   if (!context) {
-    throw new Error('useNetwork must be used within a NetworkProvider');
+    return defaultNetworkContextValue;
   }
   return context;
 }
