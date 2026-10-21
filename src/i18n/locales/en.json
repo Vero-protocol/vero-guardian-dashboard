@@ -534,5 +534,24 @@
     "thresholdNotMet": "Threshold not met",
     "simSuccess": "Simulation succeeded",
     "simError": "Simulation failed"
+  },
+  "sessionTimer": {
+    "heading": "Audit focus timer",
+    "description": "One task. One focused session.",
+    "start": "Start audit",
+    "resume": "Resume audit",
+    "pause": "Pause audit",
+    "restart": "Start another audit",
+    "reset": "Reset audit timer",
+    "idle": "Ready for a focused audit",
+    "running": "Focus session in progress",
+    "paused": "Session paused",
+    "completed": "Session complete — time recorded",
+    "progress": "Audit session progress",
+    "remainingSeconds_one": "{{count}} second remaining",
+    "remainingSeconds_other": "{{count}} seconds remaining",
+    "sessionsRecorded_one": "{{count}} session recorded",
+    "sessionsRecorded_other": "{{count}} sessions recorded",
+    "totalAudited": "Total audit time: {{duration}}"
   }
 }

@@ -534,5 +534,24 @@
     "thresholdNotMet": "Seuil non atteint",
     "simSuccess": "Simulation reussie",
     "simError": "Echec de simulation"
+  },
+  "sessionTimer": {
+    "heading": "Minuteur de concentration pour les audits",
+    "description": "Une tâche. Une session de concentration.",
+    "start": "Démarrer l’audit",
+    "resume": "Reprendre l’audit",
+    "pause": "Mettre l’audit en pause",
+    "restart": "Démarrer un autre audit",
+    "reset": "Réinitialiser le minuteur d’audit",
+    "idle": "Prêt pour un audit concentré",
+    "running": "Session de concentration en cours",
+    "paused": "Session en pause",
+    "completed": "Session terminée : temps enregistré",
+    "progress": "Progression de la session d’audit",
+    "remainingSeconds_one": "{{count}} seconde restante",
+    "remainingSeconds_other": "{{count}} secondes restantes",
+    "sessionsRecorded_one": "{{count}} session enregistrée",
+    "sessionsRecorded_other": "{{count}} sessions enregistrées",
+    "totalAudited": "Temps d’audit total : {{duration}}"
   }
 }

@@ -534,5 +534,24 @@
     "thresholdNotMet": "Umbral no alcanzado",
     "simSuccess": "Simulacion exitosa",
     "simError": "Simulacion fallida"
+  },
+  "sessionTimer": {
+    "heading": "Temporizador de concentración para auditorías",
+    "description": "Una tarea. Una sesión de concentración.",
+    "start": "Iniciar auditoría",
+    "resume": "Reanudar auditoría",
+    "pause": "Pausar auditoría",
+    "restart": "Iniciar otra auditoría",
+    "reset": "Reiniciar temporizador de auditoría",
+    "idle": "Listo para una auditoría concentrada",
+    "running": "Sesión de concentración en curso",
+    "paused": "Sesión en pausa",
+    "completed": "Sesión completada: tiempo registrado",
+    "progress": "Progreso de la sesión de auditoría",
+    "remainingSeconds_one": "Queda {{count}} segundo",
+    "remainingSeconds_other": "Quedan {{count}} segundos",
+    "sessionsRecorded_one": "{{count}} sesión registrada",
+    "sessionsRecorded_other": "{{count}} sesiones registradas",
+    "totalAudited": "Tiempo total de auditoría: {{duration}}"
   }
 }

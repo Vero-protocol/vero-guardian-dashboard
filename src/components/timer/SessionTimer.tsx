@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CheckCircle2, Pause, Play, RotateCcw, Timer as TimerIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const DEFAULT_SESSION_SECONDS = 25 * 60;
 export const TIMER_TICK_MS = 250;
@@ -31,6 +32,7 @@ export default function SessionTimer({
   now = Date.now,
   onSessionComplete,
 }: SessionTimerProps) {
+  const { t } = useTranslation();
   const sessionDurationMs = Math.max(1, durationSeconds) * 1_000;
   const [remainingMs, setRemainingMs] = useState(sessionDurationMs);
   const [status, setStatus] = useState<TimerStatus>('idle');
@@ -105,7 +107,11 @@ export default function SessionTimer({
   const remainingSeconds = remainingMs / 1_000;
   const progress = Math.min(100, Math.max(0, ((sessionDurationMs - remainingMs) / sessionDurationMs) * 100));
   const isRunning = status === 'running';
-  const primaryLabel = status === 'paused' ? 'Resume audit' : status === 'completed' ? 'Start another audit' : 'Start audit';
+  const primaryLabel = status === 'paused'
+    ? t('sessionTimer.resume')
+    : status === 'completed'
+      ? t('sessionTimer.restart')
+      : t('sessionTimer.start');
   const totalAuditedSeconds = sessions.reduce((total, session) => total + session.durationSeconds, 0);
 
   return (
@@ -114,9 +120,9 @@ export default function SessionTimer({
         <TimerIcon className="h-5 w-5 text-violet-600 dark:text-violet-400" aria-hidden="true" />
         <div>
           <h2 id="audit-session-timer-title" className="text-lg font-semibold text-slate-900 dark:text-white">
-            Audit focus timer
+            {t('sessionTimer.heading')}
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">One task. One focused session.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('sessionTimer.description')}</p>
         </div>
       </div>
 
@@ -125,20 +131,20 @@ export default function SessionTimer({
           className="font-mono text-5xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white"
           role="timer"
           aria-live="off"
-          aria-label={`${Math.ceil(remainingSeconds)} seconds remaining`}
+          aria-label={t('sessionTimer.remainingSeconds', { count: Math.ceil(remainingSeconds) })}
         >
           {formatAuditTime(remainingSeconds)}
         </p>
         <p className="mt-2 text-sm font-medium text-violet-700 dark:text-violet-300">
-          {status === 'running' && 'Focus session in progress'}
-          {status === 'paused' && 'Session paused'}
-          {status === 'idle' && 'Ready for a focused audit'}
-          {status === 'completed' && 'Session complete — time recorded'}
+          {status === 'running' && t('sessionTimer.running')}
+          {status === 'paused' && t('sessionTimer.paused')}
+          {status === 'idle' && t('sessionTimer.idle')}
+          {status === 'completed' && t('sessionTimer.completed')}
         </p>
         <div
           className="mt-4 h-2 overflow-hidden rounded-full bg-violet-100 dark:bg-violet-950"
           role="progressbar"
-          aria-label="Audit session progress"
+          aria-label={t('sessionTimer.progress')}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress)}
@@ -157,13 +163,13 @@ export default function SessionTimer({
           className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
         >
           {isRunning ? <Pause className="h-4 w-4" aria-hidden="true" /> : <Play className="h-4 w-4" aria-hidden="true" />}
-          {isRunning ? 'Pause audit' : primaryLabel}
+          {isRunning ? t('sessionTimer.pause') : primaryLabel}
         </button>
         <button
           type="button"
           onClick={reset}
           disabled={status === 'idle'}
-          aria-label="Reset audit timer"
+          aria-label={t('sessionTimer.reset')}
           className="rounded-xl border border-slate-200 bg-white px-4 text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         >
           <RotateCcw className="h-4 w-4" aria-hidden="true" />
@@ -175,9 +181,9 @@ export default function SessionTimer({
           <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
           <div>
             <p className="font-semibold text-emerald-800 dark:text-emerald-300">
-              {sessions.length} {sessions.length === 1 ? 'session' : 'sessions'} recorded
+              {t('sessionTimer.sessionsRecorded', { count: sessions.length })}
             </p>
-            <p className="text-emerald-700 dark:text-emerald-400">Total audit time: {formatAuditTime(totalAuditedSeconds)}</p>
+            <p className="text-emerald-700 dark:text-emerald-400">{t('sessionTimer.totalAudited', { duration: formatAuditTime(totalAuditedSeconds) })}</p>
           </div>
         </div>
       )}
