@@ -534,5 +534,33 @@
     "thresholdNotMet": "Threshold not met",
     "simSuccess": "Simulation succeeded",
     "simError": "Simulation failed"
+  },
+  "feedback": {
+    "open": "Send feedback",
+    "heading": "Share feedback",
+    "description": "Help improve the guardian workflow with quick UX notes.",
+    "close": "Close feedback form",
+    "success": "Feedback submitted. Thank you for helping refine the dashboard.",
+    "name": "Name",
+    "email": "Email",
+    "optional": "Optional",
+    "experience": "Experience",
+    "message": "Feedback",
+    "placeholder": "What should be improved?",
+    "cancel": "Cancel",
+    "sending": "Sending",
+    "submit": "Submit",
+    "ratings": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "needsWork": "Needs work"
+    },
+    "errors": {
+      "send": "Feedback could not be sent.",
+      "required": "Feedback message is required.",
+      "email": "Enter a valid email address.",
+      "submission": "Feedback submission failed.",
+      "payload": "Invalid feedback payload."
+    }
   }
 }

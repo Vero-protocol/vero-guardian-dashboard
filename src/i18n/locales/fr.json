@@ -534,5 +534,33 @@
     "thresholdNotMet": "Seuil non atteint",
     "simSuccess": "Simulation reussie",
     "simError": "Echec de simulation"
+  },
+  "feedback": {
+    "open": "Envoyer un avis",
+    "heading": "Partagez votre avis",
+    "description": "Aidez à améliorer le parcours des gardiens en partageant vos remarques sur l’expérience utilisateur.",
+    "close": "Fermer le formulaire d’avis",
+    "success": "Avis envoyé. Merci de nous aider à améliorer le tableau de bord.",
+    "name": "Nom",
+    "email": "Adresse e-mail",
+    "optional": "Facultatif",
+    "experience": "Expérience",
+    "message": "Avis",
+    "placeholder": "Que faudrait-il améliorer ?",
+    "cancel": "Annuler",
+    "sending": "Envoi en cours",
+    "submit": "Envoyer",
+    "ratings": {
+      "excellent": "Excellente",
+      "good": "Bonne",
+      "needsWork": "À améliorer"
+    },
+    "errors": {
+      "send": "Impossible d’envoyer l’avis.",
+      "required": "Veuillez saisir un avis.",
+      "email": "Saisissez une adresse e-mail valide.",
+      "submission": "L’envoi de l’avis a échoué.",
+      "payload": "Les données du formulaire sont invalides."
+    }
   }
 }
