@@ -31,7 +31,8 @@ const copy = [
       "required": "Feedback message is required.",
       "email": "Enter a valid email address.",
       "submission": "Feedback submission failed.",
-      "payload": "Invalid feedback payload."
+      "payload": "Invalid feedback payload.",
+      "rateLimit": "Too many requests. Please wait a moment and try again."
     }
   },
   {
@@ -60,7 +61,8 @@ const copy = [
       "required": "Es necesario escribir un comentario.",
       "email": "Introduce una direcci\u00f3n de correo electr\u00f3nico v\u00e1lida.",
       "submission": "No se pudieron enviar los comentarios.",
-      "payload": "Los datos del formulario no son v\u00e1lidos."
+      "payload": "Los datos del formulario no son v\u00e1lidos.",
+      "rateLimit": "Demasiadas solicitudes. Espera un momento y vuelve a intentarlo."
     }
   },
   {
@@ -89,7 +91,8 @@ const copy = [
       "required": "Veuillez saisir un avis.",
       "email": "Saisissez une adresse e-mail valide.",
       "submission": "L\u2019envoi de l\u2019avis a \u00e9chou\u00e9.",
-      "payload": "Les donn\u00e9es du formulaire sont invalides."
+      "payload": "Les donn\u00e9es du formulaire sont invalides.",
+      "rateLimit": "Trop de requ\u00eates. Veuillez patienter un instant avant de r\u00e9essayer."
     }
   }
 ] as const;
@@ -184,6 +187,33 @@ describe('FeedbackModal translations', () => {
     await act(async () => { await i18n.changeLanguage('fr'); });
     expect(screen.getByRole('alert')).toHaveTextContent(fr.errors[key]);
     expect(screen.getByLabelText(fr.name)).toHaveValue('Pat');
+  });
+
+  test.each(copy)('explains a rate-limit response and preserves retryable form state in $language', async (labels) => {
+    fetchMock.mockResolvedValueOnce({
+      ok: false, status: 429, json: async () => ({ error: 'Too many requests' }),
+    });
+    const i18n = await openForm(labels.language); fill(labels.language);
+    fireEvent.click(screen.getByRole('radio', { name: labels.ratings.needsWork }));
+    fireEvent.click(screen.getByRole('button', { name: labels.submit }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(labels.errors.rateLimit);
+    expect(screen.getByRole('alert')).not.toHaveTextContent(labels.errors.send);
+    expect(screen.getByLabelText(labels.message)).toHaveValue('Make the navigation clearer.');
+    expect(screen.getByRole('radio', { name: labels.ratings.needsWork })).toBeChecked();
+    expect(screen.getByRole('button', { name: labels.submit })).toBeEnabled();
+
+    const next = copy[(copy.indexOf(labels) + 1) % copy.length];
+    await act(async () => { await i18n.changeLanguage(next.language); });
+    expect(screen.getByRole('alert')).toHaveTextContent(next.errors.rateLimit);
+    expect(screen.getByLabelText(next.message)).toHaveValue('Make the navigation clearer.');
+    expect(screen.getByRole('radio', { name: next.ratings.needsWork })).toBeChecked();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    // The next response is a synthetic success; no live request or retry timer.
+    fireEvent.click(screen.getByRole('button', { name: next.submit }));
+    expect(await screen.findByText(next.success)).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body).rating).toBe('Needs work');
   });
 
   test('translates the disabled submitting state and eventual success', async () => {

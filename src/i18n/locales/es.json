@@ -1,4 +1,33 @@
 {
+  "feedback": {
+    "open": "Enviar comentarios",
+    "heading": "Comparte tus comentarios",
+    "description": "Ayuda a mejorar el flujo de trabajo de los guardianes con comentarios sobre la experiencia de uso.",
+    "close": "Cerrar formulario de comentarios",
+    "success": "Comentarios enviados. Gracias por ayudarnos a mejorar el panel.",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "optional": "Opcional",
+    "experience": "Experiencia",
+    "message": "Comentarios",
+    "placeholder": "¿Qué debería mejorarse?",
+    "cancel": "Cancelar",
+    "sending": "Enviando",
+    "submit": "Enviar",
+    "ratings": {
+      "excellent": "Excelente",
+      "good": "Buena",
+      "needsWork": "Necesita mejorar"
+    },
+    "errors": {
+      "send": "No se pudieron enviar los comentarios.",
+      "required": "Es necesario escribir un comentario.",
+      "email": "Introduce una dirección de correo electrónico válida.",
+      "submission": "No se pudieron enviar los comentarios.",
+      "payload": "Los datos del formulario no son válidos.",
+      "rateLimit": "Demasiadas solicitudes. Espera un momento y vuelve a intentarlo."
+    }
+  },
   "common": {
     "active": "Activo",
     "admin": "Admin",
@@ -534,33 +563,5 @@
     "thresholdNotMet": "Umbral no alcanzado",
     "simSuccess": "Simulacion exitosa",
     "simError": "Simulacion fallida"
-  },
-  "feedback": {
-    "open": "Enviar comentarios",
-    "heading": "Comparte tus comentarios",
-    "description": "Ayuda a mejorar el flujo de trabajo de los guardianes con comentarios sobre la experiencia de uso.",
-    "close": "Cerrar formulario de comentarios",
-    "success": "Comentarios enviados. Gracias por ayudarnos a mejorar el panel.",
-    "name": "Nombre",
-    "email": "Correo electrónico",
-    "optional": "Opcional",
-    "experience": "Experiencia",
-    "message": "Comentarios",
-    "placeholder": "¿Qué debería mejorarse?",
-    "cancel": "Cancelar",
-    "sending": "Enviando",
-    "submit": "Enviar",
-    "ratings": {
-      "excellent": "Excelente",
-      "good": "Buena",
-      "needsWork": "Necesita mejorar"
-    },
-    "errors": {
-      "send": "No se pudieron enviar los comentarios.",
-      "required": "Es necesario escribir un comentario.",
-      "email": "Introduce una dirección de correo electrónico válida.",
-      "submission": "No se pudieron enviar los comentarios.",
-      "payload": "Los datos del formulario no son válidos."
-    }
   }
 }

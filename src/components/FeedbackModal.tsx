@@ -15,6 +15,7 @@ const feedbackErrorKeys = new Map([
   ['Enter a valid email address.', 'email'],
   ['Feedback submission failed.', 'submission'],
   ['Invalid feedback payload.', 'payload'],
+  ['Too many requests', 'rateLimit'],
 ]);
 
 function sanitizeInput(value: string): string {
