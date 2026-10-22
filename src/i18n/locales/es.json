@@ -85,7 +85,8 @@
     "heading": "Acciones rapidas",
     "networkStatus": "Ver estado de la red",
     "stake": "Bloquear tokens VERO",
-    "rewards": "Historial de recompensas"
+    "rewards": "Historial de recompensas",
+    "comingSoon": "Próximamente"
   },
   "prs": {
     "loading": "Cargando feed de validaciones...",
