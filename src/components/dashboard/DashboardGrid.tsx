@@ -95,6 +95,11 @@ export default function DashboardGrid({
       base.push({ id: "audit-export", x: 8, y: 25, w: 4, h: 4 });
     }
 
+    // Proof history previously lived outside the grid. Keep it available
+    // to existing users by adding it to the default layout; saved layouts
+    // automatically gain this missing widget without resetting preferences.
+    base.push({ id: "proof-history", x: 0, y: role === "admin" ? 29 : 25, w: 12, h: 4 });
+
     return base;
   }, [role]);
 

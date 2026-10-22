@@ -94,3 +94,35 @@ describe('DashboardGrid Component', () => {
     expect(store['vero-guardian-dashboard-layout']).toBeUndefined();
   });
 });
+
+
+it.each([
+  ['guardian', '25'],
+  ['admin', '29'],
+])('saved layouts gain the proof history widget without resetting the %s layout', (role, expectedY) => {
+  jest.useFakeTimers();
+  const original = JSON.stringify([
+    { id: 'pr-feed', x: 0, y: 0, w: 8, h: 6 },
+  ]);
+  const get = jest.spyOn(Storage.prototype, 'getItem').mockReturnValue(original);
+  const set = jest.spyOn(Storage.prototype, 'setItem');
+  const remove = jest.spyOn(Storage.prototype, 'removeItem');
+
+  try {
+    const widgets: DashboardWidget[] = [
+      ...mockWidgets,
+      { id: 'proof-history', title: 'Proof History', component: <div>One proof history</div> },
+    ];
+    render(<DashboardGrid widgets={widgets} role={role} />);
+
+    const proof = screen.getByRole('group', { name: 'Proof History' });
+    expect(proof).toHaveAttribute('gs-y', expectedY);
+    expect(screen.getAllByText('One proof history')).toHaveLength(1);
+    expect(get).toHaveBeenCalledWith('vero-guardian-dashboard-layout');
+    expect(set).not.toHaveBeenCalled();
+    expect(remove).not.toHaveBeenCalled();
+  } finally {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  }
+});
