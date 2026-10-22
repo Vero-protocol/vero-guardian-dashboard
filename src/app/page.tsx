@@ -193,7 +193,8 @@ export default function Home(): ReactElement {
         component: (
           <div className="h-full flex flex-col justify-between">
             <div className="grid grid-cols-1 gap-3">
-              <button
+              <a
+                href="#network-status"
                 className="w-full flex items-center justify-between px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors group focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 aria-label={t("actions.networkStatus")}
               >
@@ -204,26 +205,26 @@ export default function Home(): ReactElement {
                   className="w-4 h-4 text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white transition-colors"
                   aria-hidden="true"
                 />
-              </button>
+              </a>
               <button
-                className="w-full flex items-center justify-between px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors group focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                aria-label={t("actions.stake")}
+                type="button"
+                disabled
+                title={t("actions.comingSoon")}
+                className="w-full flex items-center justify-between px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl border border-slate-200 dark:border-slate-700 cursor-not-allowed opacity-65"
+                aria-label={t("actions.stake") + " — " + t("actions.comingSoon")}
               >
                 <span className="font-medium">{t("actions.stake")}</span>
-                <ArrowRight
-                  className="w-4 h-4 text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white transition-colors"
-                  aria-hidden="true"
-                />
+                <span className="text-xs">{t("actions.comingSoon")}</span>
               </button>
               <button
-                className="w-full flex items-center justify-between px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors group focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                aria-label={t("actions.rewards")}
+                type="button"
+                disabled
+                title={t("actions.comingSoon")}
+                className="w-full flex items-center justify-between px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl border border-slate-200 dark:border-slate-700 cursor-not-allowed opacity-65"
+                aria-label={t("actions.rewards") + " — " + t("actions.comingSoon")}
               >
                 <span className="font-medium">{t("actions.rewards")}</span>
-                <ArrowRight
-                  className="w-4 h-4 text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white transition-colors"
-                  aria-hidden="true"
-                />
+                <span className="text-xs">{t("actions.comingSoon")}</span>
               </button>
             </div>
           </div>
@@ -507,7 +508,9 @@ export default function Home(): ReactElement {
       <footer className="border-t border-slate-200 dark:border-slate-800 mt-12 bg-white dark:bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="flex flex-col gap-6">
-            <NetworkStatus />
+            <div id="network-status" tabIndex={-1} className="scroll-mt-24">
+              <NetworkStatus />
+            </div>
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-sm text-slate-600 dark:text-slate-500">
                 {t("app.footerCopyright")}

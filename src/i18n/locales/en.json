@@ -85,7 +85,8 @@
     "heading": "Quick Actions",
     "networkStatus": "View Network Status",
     "stake": "Stake VERO Tokens",
-    "rewards": "Rewards History"
+    "rewards": "Rewards History",
+    "comingSoon": "Coming soon"
   },
   "prs": {
     "loading": "Loading validation feed...",

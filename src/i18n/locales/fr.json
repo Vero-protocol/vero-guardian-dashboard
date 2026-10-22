@@ -85,7 +85,8 @@
     "heading": "Actions rapides",
     "networkStatus": "Voir le statut du reseau",
     "stake": "Staker des tokens VERO",
-    "rewards": "Historique des recompenses"
+    "rewards": "Historique des recompenses",
+    "comingSoon": "Bientôt"
   },
   "prs": {
     "loading": "Chargement du flux de validation...",
