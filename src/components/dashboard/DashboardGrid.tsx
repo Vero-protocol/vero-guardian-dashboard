@@ -201,14 +201,13 @@ export default function DashboardGrid({
           className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           <RefreshCw className="w-4 h-4" aria-hidden="true" />
-          <span>Reset Layout</span>
+          <span>{t("widgetI18n.dashboard.resetButton")}</span>
         </button>
       </div>
 
       {/* Screen reader instructions */}
       <p className="sr-only">
-        Dashboard widgets can be rearranged by dragging the handle at the top of
-        each widget. Use the Reset Layout button to restore the default arrangement.
+        {t("widgetI18n.dashboard.instructions")}
       </p>
 
       {/* Grid Stack container */}
@@ -241,8 +240,8 @@ export default function DashboardGrid({
                   className="widget-drag-handle flex items-center justify-between pb-2 mb-2 border-b border-slate-150 dark:border-slate-800 cursor-move text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                   tabIndex={0}
                   role="button"
-                  aria-label={`Drag to rearrange ${widget.title} widget`}
-                  title={`Drag to move ${widget.title}`}
+                  aria-label={t("widgetI18n.dashboard.dragAria", { name: widget.title })}
+                  title={t("widgetI18n.dashboard.dragTitle", { name: widget.title })}
                 >
                   <span className="text-xs font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
                     {widget.title}

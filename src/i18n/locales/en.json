@@ -11,6 +11,82 @@
     "unauthorized": "Unauthorized",
     "yes": "Yes"
   },
+  "widgetI18n": {
+    "alert": {
+      "dismiss": "Dismiss alert"
+    },
+    "dashboard": {
+      "resetButton": "Reset Layout",
+      "instructions": "Dashboard widgets can be rearranged by dragging the handle at the top of each widget. Use the Reset Layout button to restore the default arrangement.",
+      "dragAria": "Drag to rearrange {{name}} widget",
+      "dragTitle": "Drag to move {{name}}"
+    },
+    "search": {
+      "searching": "Searching...",
+      "noQuery": "No search query",
+      "noResults": "No results found",
+      "enterTerm": "Enter a search term to find contracts and functions",
+      "tryOther": "Try different keywords or check the spelling",
+      "resultsAria": "Search results",
+      "functionLabel": "Function:",
+      "matchLabel": "Match:",
+      "heading": "On-Chain State Search",
+      "indexed_one": "{{count}} contract indexed",
+      "indexed_other": "{{count}} contracts indexed",
+      "placeholder": "Search contracts, functions, or on-chain data...",
+      "filterByType": "Filter by type",
+      "resetFilters": "Reset filters",
+      "reset": "Reset",
+      "found_one": "{{count}} result found",
+      "found_other": "{{count}} results found",
+      "noIndexed": "No contracts indexed",
+      "addContracts": "Add contracts to the search index to enable searching",
+      "matchType": {
+        "contract": "Contract",
+        "function": "Function",
+        "description": "Description",
+        "tag": "Tag"
+      }
+    },
+    "batch": {
+      "aria": "Batch transaction builder",
+      "heading": "Batch Transaction Builder",
+      "description": "Queue multiple operations and broadcast them in a single signed transaction.",
+      "operationType": "Operation type",
+      "operation": {
+        "vote": "Vote",
+        "data": "Manage data",
+        "payment": "Payment",
+        "sorobanVote": "Soroban vote",
+        "sorobanHalt": "Soroban halt"
+      },
+      "prNumber": "PR number",
+      "choice": "Choice",
+      "approve": "Approve",
+      "reject": "Reject",
+      "dataName": "Data name",
+      "dataValue": "Data value",
+      "destination": "Destination",
+      "amount": "Amount (XLM)",
+      "contractId": "Contract ID",
+      "add": "Add operation",
+      "maxOperations": "A transaction can hold at most {{count}} operations.",
+      "queued_one": "Queued operations ({{count}})",
+      "queued_other": "Queued operations ({{count}})",
+      "clear": "Clear all",
+      "empty": "No operations queued yet. Add one above to start your batch.",
+      "moveUp": "Move operation up",
+      "moveDown": "Move operation down",
+      "remove": "Remove operation",
+      "broadcasting": "Broadcasting...",
+      "buildBroadcast": "Build & broadcast",
+      "connectWallet": "Connect your wallet to broadcast the batch.",
+      "result_one": "{{type}} {{count}} operation in",
+      "result_other": "{{type}} {{count}} operations in",
+      "sorobanTx": "Soroban tx",
+      "broadcast": "Broadcast"
+    }
+  },
   "app": {
     "networkName": "Decentralized Validation Network",
     "footerCopyright": "© 2026 Vero Guardian. All rights reserved.",

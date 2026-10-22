@@ -11,6 +11,82 @@
     "unauthorized": "No autorizado",
     "yes": "Si"
   },
+  "widgetI18n": {
+    "alert": {
+      "dismiss": "Descartar alerta"
+    },
+    "dashboard": {
+      "resetButton": "Restablecer diseño",
+      "instructions": "Puedes reorganizar los widgets arrastrando el control de la parte superior. Usa Restablecer diseño para recuperar la disposición predeterminada.",
+      "dragAria": "Arrastrar para reorganizar el widget {{name}}",
+      "dragTitle": "Arrastrar para mover {{name}}"
+    },
+    "search": {
+      "searching": "Buscando...",
+      "noQuery": "No hay término de búsqueda",
+      "noResults": "No se encontraron resultados",
+      "enterTerm": "Introduce un término para buscar contratos y funciones",
+      "tryOther": "Prueba otras palabras clave o revisa la ortografía",
+      "resultsAria": "Resultados de búsqueda",
+      "functionLabel": "Función :",
+      "matchLabel": "Coincidencia :",
+      "heading": "Búsqueda de estado en cadena",
+      "indexed_one": "{{count}} contrato indexado",
+      "indexed_other": "{{count}} contratos indexados",
+      "placeholder": "Buscar contratos, funciones o datos en cadena...",
+      "filterByType": "Filtrar por tipo",
+      "resetFilters": "Restablecer filtros",
+      "reset": "Restablecer",
+      "found_one": "{{count}} resultado encontrado",
+      "found_other": "{{count}} resultados encontrados",
+      "noIndexed": "No hay contratos indexados",
+      "addContracts": "Añade contratos al índice para habilitar la búsqueda",
+      "matchType": {
+        "contract": "Contrato",
+        "function": "Función",
+        "description": "Descripción",
+        "tag": "Etiqueta"
+      }
+    },
+    "batch": {
+      "aria": "Constructor de transacciones por lotes",
+      "heading": "Constructor de transacciones por lotes",
+      "description": "Agrupa varias operaciones y envíalas en una única transacción firmada.",
+      "operationType": "Tipo de operación",
+      "operation": {
+        "vote": "Voto",
+        "data": "Gestionar datos",
+        "payment": "Pago",
+        "sorobanVote": "Voto Soroban",
+        "sorobanHalt": "Detención Soroban"
+      },
+      "prNumber": "Número de PR",
+      "choice": "Elección",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "dataName": "Nombre del dato",
+      "dataValue": "Valor del dato",
+      "destination": "Destino",
+      "amount": "Cantidad (XLM)",
+      "contractId": "ID de contrato",
+      "add": "Añadir operación",
+      "maxOperations": "Una transacción puede contener como máximo {{count}} operaciones.",
+      "queued_one": "Operaciones en cola ({{count}})",
+      "queued_other": "Operaciones en cola ({{count}})",
+      "clear": "Borrar todo",
+      "empty": "Todavía no hay operaciones en cola. Añade una arriba para empezar.",
+      "moveUp": "Subir operación",
+      "moveDown": "Bajar operación",
+      "remove": "Eliminar operación",
+      "broadcasting": "Enviando...",
+      "buildBroadcast": "Crear y enviar",
+      "connectWallet": "Conecta tu monedero para enviar el lote.",
+      "result_one": "{{type}} : {{count}} operación en",
+      "result_other": "{{type}} : {{count}} operaciones en",
+      "sorobanTx": "Transacción Soroban",
+      "broadcast": "Envío"
+    }
+  },
   "app": {
     "networkName": "Red de validacion descentralizada",
     "footerCopyright": "© 2026 Vero Guardian. Todos los derechos reservados.",
