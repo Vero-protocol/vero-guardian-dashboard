@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, RefreshCw } from 'lucide-react';
 import { SearchInput } from './SearchInput';
 import { SearchResults } from './SearchResults';
@@ -34,9 +35,10 @@ export function GlobalSearchPanel({
   maxResults = 10,
   minScore = 20,
   debounceMs = 300,
-  placeholder = 'Search contracts, functions, or on-chain data...',
+  placeholder,
   storageKey = 'search-index-contracts',
 }: GlobalSearchPanelProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<ContractMetadata['type'][]>([]);
@@ -92,11 +94,11 @@ export function GlobalSearchPanel({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 id="global-search-title" className="text-lg font-bold text-slate-900 dark:text-white">
-          On-Chain State Search
+          {t("widgetI18n.search.heading")}
         </h2>
         {showStats && indexedContracts.length > 0 && (
           <div className="text-xs font-medium text-slate-600 dark:text-slate-400">
-            {indexedContracts.length} contract{indexedContracts.length !== 1 ? 's' : ''} indexed
+            {t("widgetI18n.search.indexed", { count: indexedContracts.length })}
           </div>
         )}
       </div>
@@ -105,7 +107,7 @@ export function GlobalSearchPanel({
       <SearchInput
         value={query}
         onChange={setQuery}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("widgetI18n.search.placeholder")}
         isLoading={isIndexLoading || isSearching}
         error={error}
         autoFocus
@@ -115,16 +117,16 @@ export function GlobalSearchPanel({
       {showFilters && availableTypes.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Filter by type</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t("widgetI18n.search.filterByType")}</label>
             {selectedTypes.length > 0 && (
               <button
                 onClick={handleRefresh}
                 type="button"
                 className="flex items-center gap-1 text-xs text-slate-600 transition hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
-                aria-label="Reset filters"
+                aria-label={t("widgetI18n.search.resetFilters")}
               >
                 <RefreshCw className="h-3 w-3" />
-                Reset
+                {t("widgetI18n.search.reset")}
               </button>
             )}
           </div>
@@ -152,7 +154,7 @@ export function GlobalSearchPanel({
       {query && (
         <div className="flex items-center justify-between text-sm">
           <span className="text-slate-600 dark:text-slate-400">
-            {results.length} result{results.length !== 1 ? 's' : ''} found
+            {t("widgetI18n.search.found", { count: results.length })}
             {selectedTypes.length > 0 && ` (${selectedTypes.join(', ')})`}
           </span>
         </div>
@@ -171,9 +173,9 @@ export function GlobalSearchPanel({
       {/* Empty State */}
       {indexedContracts.length === 0 && !isIndexLoading && (
         <div className="rounded-lg border border-slate-200 bg-slate-50 px-6 py-8 text-center dark:border-slate-700 dark:bg-slate-900/30">
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">No contracts indexed</p>
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{t("widgetI18n.search.noIndexed")}</p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Add contracts to the search index to enable searching
+            {t("widgetI18n.search.addContracts")}
           </p>
         </div>
       )}

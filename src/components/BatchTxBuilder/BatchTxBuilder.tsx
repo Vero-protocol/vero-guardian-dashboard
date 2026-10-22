@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, type ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowDown, ArrowUp, CheckCircle2, Layers, Loader2, Plus, Send, Trash2 } from 'lucide-react';
 import { useWallet } from '@/context/WalletContext';
 import {
@@ -76,6 +77,7 @@ export default function BatchTxBuilder({
   broadcaster = defaultBatchTransactionBuilder,
 }: BatchTxBuilderProps = {}): ReactElement {
   const { publicKey, isConnected } = useWallet();
+  const { t } = useTranslation();
   const [operations, setOperations] = useState<QueuedOperation[]>([]);
   const [draft, setDraft] = useState<OperationDraft>(() => emptyDraft('vote'));
   const [isBroadcasting, setIsBroadcasting] = useState(false);
@@ -161,23 +163,23 @@ export default function BatchTxBuilder({
 
   return (
     <section
-      aria-label="Batch transaction builder"
+      aria-label={t("widgetI18n.batch.aria")}
       className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-lg"
     >
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
           <Layers className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-          Batch Transaction Builder
+          {t("widgetI18n.batch.heading")}
         </h3>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          Queue multiple operations and broadcast them in a single signed transaction.
+          {t("widgetI18n.batch.description")}
         </p>
       </div>
 
       {/* Draft form */}
       <div className="space-y-3 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
         <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-          Operation type
+          {t("widgetI18n.batch.operationType")}
           <select
             data-testid="operation-type"
             className="mt-1 block w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -186,7 +188,7 @@ export default function BatchTxBuilder({
           >
             {OPERATION_TYPES.map((type) => (
               <option key={type} value={type}>
-                {OPERATION_TYPE_LABELS[type]}
+                {t("widgetI18n.batch.operation." + type, { defaultValue: OPERATION_TYPE_LABELS[type] })}
               </option>
             ))}
           </select>
@@ -195,7 +197,7 @@ export default function BatchTxBuilder({
         {draft.type === 'vote' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-              PR number
+              {t("widgetI18n.batch.prNumber")}
               <input
                 data-testid="vote-pr"
                 type="text"
@@ -207,15 +209,15 @@ export default function BatchTxBuilder({
               />
             </label>
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-              Choice
+              {t("widgetI18n.batch.choice")}
               <select
                 data-testid="vote-choice"
                 className="mt-1 block w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 value={draft.choice}
                 onChange={(event) => updateDraft({ choice: event.target.value as 'approve' | 'reject' })}
               >
-                <option value="approve">Approve</option>
-                <option value="reject">Reject</option>
+                <option value="approve">{t("widgetI18n.batch.approve")}</option>
+                <option value="reject">{t("widgetI18n.batch.reject")}</option>
               </select>
             </label>
           </div>
@@ -224,7 +226,7 @@ export default function BatchTxBuilder({
         {draft.type === 'data' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-              Data name
+              {t("widgetI18n.batch.dataName")}
               <input
                 data-testid="data-name"
                 type="text"
@@ -235,7 +237,7 @@ export default function BatchTxBuilder({
               />
             </label>
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-              Data value
+              {t("widgetI18n.batch.dataValue")}
               <input
                 data-testid="data-value"
                 type="text"
@@ -251,7 +253,7 @@ export default function BatchTxBuilder({
         {draft.type === 'payment' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-              Destination
+              {t("widgetI18n.batch.destination")}
               <input
                 data-testid="payment-destination"
                 type="text"
@@ -262,7 +264,7 @@ export default function BatchTxBuilder({
               />
             </label>
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-              Amount (XLM)
+              {t("widgetI18n.batch.amount")}
               <input
                 data-testid="payment-amount"
                 type="text"
@@ -279,7 +281,7 @@ export default function BatchTxBuilder({
         {draft.type === 'sorobanVote' && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-              Contract ID
+              {t("widgetI18n.batch.contractId")}
               <input
                 data-testid="soroban-vote-contract"
                 type="text"
@@ -290,7 +292,7 @@ export default function BatchTxBuilder({
               />
             </label>
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-              PR number
+              {t("widgetI18n.batch.prNumber")}
               <input
                 data-testid="soroban-vote-pr"
                 type="text"
@@ -302,15 +304,15 @@ export default function BatchTxBuilder({
               />
             </label>
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-              Choice
+              {t("widgetI18n.batch.choice")}
               <select
                 data-testid="soroban-vote-choice"
                 className="mt-1 block w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 value={draft.choice}
                 onChange={(event) => updateDraft({ choice: event.target.value as 'approve' | 'reject' })}
               >
-                <option value="approve">Approve</option>
-                <option value="reject">Reject</option>
+                <option value="approve">{t("widgetI18n.batch.approve")}</option>
+                <option value="reject">{t("widgetI18n.batch.reject")}</option>
               </select>
             </label>
           </div>
@@ -318,7 +320,7 @@ export default function BatchTxBuilder({
 
         {draft.type === 'sorobanHalt' && (
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-            Contract ID
+            {t("widgetI18n.batch.contractId")}
             <input
               data-testid="soroban-halt-contract"
               type="text"
@@ -342,12 +344,12 @@ export default function BatchTxBuilder({
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <Plus className="w-4 h-4" aria-hidden="true" />
-            Add operation
+            {t("widgetI18n.batch.add")}
           </button>
         </div>
         {isFull && (
           <p className="text-xs text-amber-600 dark:text-amber-400">
-            A transaction can hold at most {MAX_BATCH_OPERATIONS} operations.
+            {t("widgetI18n.batch.maxOperations", { count: MAX_BATCH_OPERATIONS })}
           </p>
         )}
       </div>
@@ -356,7 +358,7 @@ export default function BatchTxBuilder({
       <div className="mt-5">
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-            Queued operations ({operations.length})
+            {t("widgetI18n.batch.queued", { count: operations.length })}
           </h4>
           {operations.length > 0 && (
             <button
@@ -365,14 +367,14 @@ export default function BatchTxBuilder({
               onClick={clearAll}
               className="text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors focus:outline-none focus:underline"
             >
-              Clear all
+              {t("widgetI18n.batch.clear")}
             </button>
           )}
         </div>
 
         {operations.length === 0 ? (
           <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">
-            No operations queued yet. Add one above to start your batch.
+            {t("widgetI18n.batch.empty")}
           </p>
         ) : (
           <ol className="space-y-2">
@@ -390,7 +392,7 @@ export default function BatchTxBuilder({
                 </span>
                 <button
                   type="button"
-                  aria-label="Move operation up"
+                  aria-label={t("widgetI18n.batch.moveUp")}
                   onClick={() => move(index, 'up')}
                   disabled={index === 0}
                   className="p-1 rounded text-slate-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -399,7 +401,7 @@ export default function BatchTxBuilder({
                 </button>
                 <button
                   type="button"
-                  aria-label="Move operation down"
+                  aria-label={t("widgetI18n.batch.moveDown")}
                   onClick={() => move(index, 'down')}
                   disabled={index === operations.length - 1}
                   className="p-1 rounded text-slate-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -408,7 +410,7 @@ export default function BatchTxBuilder({
                 </button>
                 <button
                   type="button"
-                  aria-label="Remove operation"
+                  aria-label={t("widgetI18n.batch.remove")}
                   onClick={() => remove(operation.id)}
                   className="p-1 rounded text-slate-500 hover:text-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-500"
                 >
@@ -432,19 +434,19 @@ export default function BatchTxBuilder({
           {isBroadcasting ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-              Broadcasting...
+              {t("widgetI18n.batch.broadcasting")}
             </>
           ) : (
             <>
               <Send className="w-4 h-4" aria-hidden="true" />
-              Build &amp; broadcast
+              {t("widgetI18n.batch.buildBroadcast")}
             </>
           )}
         </button>
 
         {!isConnected && (
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 text-center">
-            Connect your wallet to broadcast the batch.
+            {t("widgetI18n.batch.connectWallet")}
           </p>
         )}
 
@@ -465,7 +467,7 @@ export default function BatchTxBuilder({
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" aria-hidden="true" />
             <span className="text-slate-700 dark:text-slate-200">
-              {'sendResponse' in result ? 'Soroban tx' : 'Broadcast'} {result.operationCount} operation{result.operationCount === 1 ? '' : 's'} in{' '}
+              {t("widgetI18n.batch.result", { count: result.operationCount, type: "sendResponse" in result ? t("widgetI18n.batch.sorobanTx") : t("widgetI18n.batch.broadcast") })}{" "}
               <span className="font-mono text-emerald-700 dark:text-emerald-400">{shortenHash(result.hash)}</span>
             </span>
           </div>
