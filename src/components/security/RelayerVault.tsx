@@ -15,9 +15,12 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useOptionalRole } from '@/context/RoleContext';
 
 export default function RelayerVault(): ReactElement {
   const { t } = useTranslation();
+  const roleContext = useOptionalRole();
+  const activeRole = roleContext?.role ?? 'admin';
   const [activeTab, setActiveTab] = useState<'status' | 'encrypt' | 'verify'>('status');
 
   // Vault Status State
@@ -87,7 +90,10 @@ export default function RelayerVault(): ReactElement {
     try {
       const res = await fetch('/api/vault', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-vero-role': activeRole,
+        },
         body: JSON.stringify({
           action: 'encrypt',
           secret: secret.trim(),
@@ -127,7 +133,10 @@ export default function RelayerVault(): ReactElement {
 
       const res = await fetch('/api/vault', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-vero-role': activeRole,
+        },
         body: JSON.stringify({
           action: 'verify',
           record: parsedRecord,

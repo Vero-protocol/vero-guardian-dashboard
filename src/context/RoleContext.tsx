@@ -117,3 +117,7 @@ export function useRole(): RoleContextValue {
   }
   return context;
 }
+
+export function useOptionalRole(): RoleContextValue | undefined {
+  return useContext(RoleContext);
+}
