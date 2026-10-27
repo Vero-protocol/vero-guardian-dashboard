@@ -32,6 +32,7 @@ import SecurityScannerResults from "@/components/security";
 import RelayerVault from "@/components/security/RelayerVault";
 import AuditExport from "@/components/security/AuditExport";
 import ContractCallGraph from "@/components/ContractCallGraph";
+import IPFSDocViewer from "@/components/IPFSDocViewer";
 import TaskCard from "@/components/TaskCard";
 import ThemeToggle from "@/components/ThemeToggle";
 import TransactionFeed from "@/components/TransactionFeed";
@@ -288,6 +289,17 @@ export default function Home(): ReactElement {
         component: (
           <ErrorBoundary>
             <ContractCallGraph />
+          </ErrorBoundary>
+        ),
+      },
+      {
+        id: "ipfs-doc-viewer",
+        title: t("ipfsDocViewer.heading", {
+          defaultValue: "IPFS Documentation Viewer",
+        }),
+        component: (
+          <ErrorBoundary>
+            <IPFSDocViewer />
           </ErrorBoundary>
         ),
       },
