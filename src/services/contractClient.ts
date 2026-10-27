@@ -2,23 +2,42 @@ import * as StellarSdk from '@stellar/stellar-sdk';
 import { getWalletProvider, type WalletProviderId } from '../lib/wallets';
 import { defaultNetworkConfig, DEFAULT_HORIZON_URL, CONSENSUS_THRESHOLD_KEY } from './rpc';
 
+export type VoteChoice = 'approve' | 'reject';
+
+export function buildVoteDataKey(prId: number | string, choice: VoteChoice): string {
+  return `vote_${String(prId).trim()}_${choice}`;
+}
+
 /**
  * Build, Freighter-sign, and submit a vote transaction.
  *
  * @param prId GitHub PR number registered by the Vero Relayer
  * @param publicKey Stellar public key from WalletContext
- * @param horizonUrl Optional Horizon URL (defaults to env or testnet)
+ * @param horizonUrl Optional Horizon URL (defaults to env or testnet), or VoteChoice shorthand
  * @param networkPassphrase Optional network passphrase (defaults to testnet)
+ * @param providerId Wallet provider ID (defaults to 'freighter')
+ * @param choice Vote choice ('approve' | 'reject', defaults to 'approve')
+ * @param weight Vote weight integer (defaults to 1)
  * @returns Submitted transaction hash
  */
 export async function castVote(
   prId: number,
   publicKey: string,
-  horizonUrl: string = defaultNetworkConfig.horizonUrl,
+  horizonUrl: string | VoteChoice = defaultNetworkConfig.horizonUrl,
   networkPassphrase: string = defaultNetworkConfig.networkPassphrase,
-  providerId: WalletProviderId = 'freighter'
+  providerId: WalletProviderId = 'freighter',
+  choice: VoteChoice = 'approve',
+  weight: number = 1
 ): Promise<string> {
-  const server = new StellarSdk.Horizon.Server(horizonUrl);
+  const isShorthandChoice = horizonUrl === 'approve' || horizonUrl === 'reject';
+  const resolvedChoice: VoteChoice = isShorthandChoice ? horizonUrl : choice;
+  const resolvedHorizonUrl = isShorthandChoice
+    ? defaultNetworkConfig.horizonUrl
+    : horizonUrl;
+  const normalizedWeight =
+    Number.isFinite(weight) && weight > 0 ? Math.floor(weight) : 1;
+
+  const server = new StellarSdk.Horizon.Server(resolvedHorizonUrl);
   const account = await server.loadAccount(publicKey);
 
   const tx = new StellarSdk.TransactionBuilder(account, {
@@ -26,7 +45,10 @@ export async function castVote(
     networkPassphrase,
   })
     .addOperation(
-      StellarSdk.Operation.manageData({ name: `vote_${prId}`, value: 'approve' })
+      StellarSdk.Operation.manageData({
+        name: buildVoteDataKey(prId, resolvedChoice),
+        value: String(normalizedWeight),
+      })
     )
     .setTimeout(30)
     .build();
@@ -62,7 +84,8 @@ export async function castVote(
 export async function getConsensusProgress(
   taskId: string,
   horizonUrl: string = defaultNetworkConfig.horizonUrl,
-  networkPassphrase: string = defaultNetworkConfig.networkPassphrase
+  networkPassphrase: string = defaultNetworkConfig.networkPassphrase,
+  guardianPublicKeys?: string[]
 ): Promise<{ currentWeight: number; threshold: number; approveWeight: number; rejectWeight: number }> {
   const server = new StellarSdk.Horizon.Server(horizonUrl);
 
@@ -72,21 +95,39 @@ export async function getConsensusProgress(
 
   const triagedId = taskId.trim();
 
-  // Load the relayer account that stores the task/vote data entries
+  // Load the relayer account and any configured guardian accounts that store vote data entries
   const relayerPublicKey = process.env.NEXT_PUBLIC_RELAYER_PUBLIC_KEY;
-  if (!relayerPublicKey) {
+  const envGuardianKeys = (process.env.NEXT_PUBLIC_GUARDIAN_PUBLIC_KEYS || '')
+    .split(',')
+    .map((k) => k.trim())
+    .filter(Boolean);
+  const accountIds = Array.from(
+    new Set([
+      ...(relayerPublicKey ? [relayerPublicKey] : []),
+      ...(guardianPublicKeys ?? []),
+      ...envGuardianKeys,
+    ])
+  );
+
+  if (accountIds.length === 0) {
     throw new Error('Relayer public key not configured (NEXT_PUBLIC_RELAYER_PUBLIC_KEY)');
   }
 
-  let account;
-  try {
-    account = await server.loadAccount(relayerPublicKey);
-  } catch (err) {
-    throw new Error(`Failed to load relayer account for consensus data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  const accounts: any[] = [];
+  for (const accountId of accountIds) {
+    try {
+      const acc = await server.loadAccount(accountId);
+      accounts.push(acc);
+    } catch (err) {
+      if (accountId === relayerPublicKey && accounts.length === 0 && accountIds.length === 1) {
+        throw new Error(
+          `Failed to load relayer account for consensus data: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+      }
+    }
   }
 
-  const dataAttr = (account as any).data_attr as Record<string, string> | undefined;
-  if (!dataAttr || typeof dataAttr !== 'object') {
+  if (accounts.length === 0) {
     return { currentWeight: 0, threshold: 51, approveWeight: 0, rejectWeight: 0 };
   }
 
@@ -96,41 +137,47 @@ export async function getConsensusProgress(
     return Buffer.from(value, 'base64').toString();
   };
 
-  // Read consensus threshold from data entries (or use default)
   let threshold = 51;
-  const thresholdRaw = dataAttr[CONSENSUS_THRESHOLD_KEY];
-  if (thresholdRaw) {
-    try {
-      const parsed = parseInt(decodeBase64(thresholdRaw).trim(), 10);
-      if (Number.isFinite(parsed) && parsed > 0) {
-        threshold = parsed;
-      }
-    } catch {
-      // Fall back to default threshold
-    }
-  }
-
-  // Read approve votes for this task
-  const approveKey = `vote_${triagedId}_approve`;
-  const approveRaw = dataAttr[approveKey];
   let approveWeight = 0;
-  if (approveRaw) {
-    try {
-      approveWeight = parseInt(decodeBase64(approveRaw).trim(), 10) || 0;
-    } catch {
-      approveWeight = 0;
-    }
-  }
-
-  // Read reject votes for this task
-  const rejectKey = `vote_${triagedId}_reject`;
-  const rejectRaw = dataAttr[rejectKey];
   let rejectWeight = 0;
-  if (rejectRaw) {
-    try {
-      rejectWeight = parseInt(decodeBase64(rejectRaw).trim(), 10) || 0;
-    } catch {
-      rejectWeight = 0;
+
+  const approveKey = buildVoteDataKey(triagedId, 'approve');
+  const rejectKey = buildVoteDataKey(triagedId, 'reject');
+
+  for (const account of accounts) {
+    const dataAttr = (account as any)?.data_attr as Record<string, string> | undefined;
+    if (!dataAttr || typeof dataAttr !== 'object') {
+      continue;
+    }
+
+    const thresholdRaw = dataAttr[CONSENSUS_THRESHOLD_KEY];
+    if (thresholdRaw) {
+      try {
+        const parsed = parseInt(decodeBase64(thresholdRaw).trim(), 10);
+        if (Number.isFinite(parsed) && parsed > 0) {
+          threshold = parsed;
+        }
+      } catch {
+        // Fall back to default threshold
+      }
+    }
+
+    const approveRaw = dataAttr[approveKey];
+    if (approveRaw) {
+      try {
+        approveWeight += parseInt(decodeBase64(approveRaw).trim(), 10) || 0;
+      } catch {
+        // Ignore malformed entry
+      }
+    }
+
+    const rejectRaw = dataAttr[rejectKey];
+    if (rejectRaw) {
+      try {
+        rejectWeight += parseInt(decodeBase64(rejectRaw).trim(), 10) || 0;
+      } catch {
+        // Ignore malformed entry
+      }
     }
   }
 
