@@ -41,7 +41,7 @@ jest.mock('@/lib/wallets', () => {
   };
 });
 
-import { castVote } from '@/services/contractClient';
+import { castVote, getConsensusProgress, buildVoteDataKey } from '@/services/contractClient';
 import { getWalletProvider } from '@/lib/wallets';
 import * as StellarSdk from '@stellar/stellar-sdk';
 
@@ -118,5 +118,65 @@ describe('castVote', () => {
   it('propagates signing errors', async () => {
     mockProvider.signTransaction.mockRejectedValue(new Error('User rejected'));
     await expect(castVote(42, PUBLIC_KEY)).rejects.toThrow('User rejected');
+  });
+
+  it('round-trips castVote manageData entries (approve and reject) through getConsensusProgress', async () => {
+    const capturedManageData: Array<{ name: string; value: string }> = [];
+    const manageDataSpy = jest
+      .spyOn(StellarSdk.Operation, 'manageData')
+      .mockImplementation((opts: any) => {
+        capturedManageData.push({ name: opts.name, value: String(opts.value) });
+        return {} as any;
+      });
+
+    await castVote(42, PUBLIC_KEY, undefined, undefined, 'freighter', 'approve', 25);
+    await castVote(42, 'GGUARDIAN2', undefined, undefined, 'freighter', 'reject', 10);
+
+    expect(capturedManageData).toEqual([
+      { name: buildVoteDataKey(42, 'approve'), value: '25' },
+      { name: buildVoteDataKey(42, 'reject'), value: '10' },
+    ]);
+
+    const dataAttr: Record<string, string> = {};
+    for (const entry of capturedManageData) {
+      dataAttr[entry.name] = Buffer.from(entry.value, 'utf-8').toString('base64');
+    }
+
+    const prevRelayer = process.env.NEXT_PUBLIC_RELAYER_PUBLIC_KEY;
+    process.env.NEXT_PUBLIC_RELAYER_PUBLIC_KEY = PUBLIC_KEY;
+
+    mockServer.loadAccount.mockImplementation(async (accountId: string) => {
+      if (accountId === PUBLIC_KEY) {
+        return {
+          data_attr: {
+            [capturedManageData[0].name]: dataAttr[capturedManageData[0].name],
+          },
+        };
+      }
+      if (accountId === 'GGUARDIAN2') {
+        return {
+          data_attr: {
+            [capturedManageData[1].name]: dataAttr[capturedManageData[1].name],
+          },
+        };
+      }
+      return { data_attr: {} };
+    });
+
+    try {
+      const progress = await getConsensusProgress(
+        '42',
+        undefined,
+        undefined,
+        ['GGUARDIAN2']
+      );
+      expect(progress.approveWeight).toBe(25);
+      expect(progress.rejectWeight).toBe(10);
+      expect(progress.currentWeight).toBe(35);
+      expect(progress.threshold).toBe(51);
+    } finally {
+      process.env.NEXT_PUBLIC_RELAYER_PUBLIC_KEY = prevRelayer;
+      manageDataSpy.mockRestore();
+    }
   });
 });
