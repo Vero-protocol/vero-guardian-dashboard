@@ -2,6 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { WalletProvider, useWallet } from '@/context/WalletContext';
 import { getSessionItem, setSessionItem } from '@/auth/session';
+import { getReputation } from '@/lib/stellar-interact';
+import { NetworkProvider, useNetwork } from '@/context/NetworkContext';
+import { defaultNetworkConfig } from '@/services/rpc';
 
 jest.mock('@/auth/session', () => {
   const store: Record<string, string> = {};
@@ -111,13 +114,14 @@ Object.defineProperty(window, 'localStorage', {
 });
 
 function TestComponent() {
-  const { publicKey, isConnected, isLoading, error, connect, disconnect } = useWallet();
+  const { publicKey, isConnected, isLoading, error, connect, disconnect, reputation } = useWallet();
 
   return (
     <div>
       <div data-testid="public-key">{publicKey || 'No key'}</div>
       <div data-testid="is-connected">{isConnected ? 'Connected' : 'Disconnected'}</div>
       <div data-testid="is-loading">{isLoading ? 'Loading' : 'Ready'}</div>
+      <div data-testid="reputation">{reputation}</div>
       <div data-testid="error">{error || 'No error'}</div>
       <button onClick={() => connect()} data-testid="connect-btn">
         Connect
@@ -420,4 +424,69 @@ describe('WalletContext', () => {
       expect(screen.getByTestId('is-connected')).toHaveTextContent('Connected');
     });
   });
+
+  describe('reputation network synchronization', () => {
+    it('should query getReputation with default Horizon URL when NetworkProvider is absent', async () => {
+      const mockGetReputation = getReputation as unknown as jest.Mock;
+      mockGetReputation.mockResolvedValue(77);
+
+      render(
+        <WalletProvider>
+          <TestComponent />
+        </WalletProvider>
+      );
+
+      await waitFor(() => expect(screen.getByTestId('is-loading')).toHaveTextContent('Ready'));
+      fireEvent.click(screen.getByTestId('connect-btn'));
+
+      await waitFor(() => expect(screen.getByTestId('public-key')).toHaveTextContent(PUBLIC_KEY));
+      await waitFor(() => {
+        expect(mockGetReputation).toHaveBeenCalledWith(PUBLIC_KEY, defaultNetworkConfig.horizonUrl);
+      });
+      await waitFor(() => expect(screen.getByTestId('reputation')).toHaveTextContent('77'));
+    });
+
+    it('should query getReputation with active Horizon URL from NetworkProvider', async () => {
+      const mockGetReputation = getReputation as unknown as jest.Mock;
+      mockGetReputation.mockResolvedValue(99);
+      const customHorizon = 'https://horizon.custom-stellar.org';
+
+      function SwitchNetworkButton() {
+        const { setHorizonUrl } = useNetwork();
+        return (
+          <button
+            data-testid="switch-network-btn"
+            onClick={() => setHorizonUrl(customHorizon)}
+          >
+            Switch
+          </button>
+        );
+      }
+
+      render(
+        <NetworkProvider>
+          <WalletProvider>
+            <TestComponent />
+            <SwitchNetworkButton />
+          </WalletProvider>
+        </NetworkProvider>
+      );
+
+      await waitFor(() => expect(screen.getByTestId('is-loading')).toHaveTextContent('Ready'));
+      fireEvent.click(screen.getByTestId('connect-btn'));
+
+      await waitFor(() => expect(screen.getByTestId('public-key')).toHaveTextContent(PUBLIC_KEY));
+      await waitFor(() => {
+        expect(mockGetReputation).toHaveBeenCalledWith(PUBLIC_KEY, defaultNetworkConfig.horizonUrl);
+      });
+
+      // Switch to custom network
+      fireEvent.click(screen.getByTestId('switch-network-btn'));
+
+      await waitFor(() => {
+        expect(mockGetReputation).toHaveBeenCalledWith(PUBLIC_KEY, customHorizon);
+      });
+    });
+  });
 });
+
