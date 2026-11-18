@@ -22,6 +22,8 @@ import {
   type WalletProviderInfo,
 } from '@/lib/wallets';
 import { getReputation } from '@/lib/stellar-interact';
+import { useOptionalNetwork } from '@/context/NetworkContext';
+import { defaultNetworkConfig } from '@/services/rpc';
 import { useChainState } from '@/hooks/useChainState';
 import { useEvents } from '@/hooks/useEvents';
 import { getSessionItem, removeSessionItem, setSessionItem, sessionManager } from '@/auth/session';
@@ -75,6 +77,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [activeProvider, setActiveProvider] = useState<WalletProviderId | null>(null);
   const [availableProviders, setAvailableProviders] = useState<WalletProviderInfo[]>([]);
   const reputationRequestIdRef = useRef(0);
+  const networkContext = useOptionalNetwork();
+  const horizonUrl = networkContext?.networkConfig.horizonUrl ?? defaultNetworkConfig.horizonUrl;
   const { syncVersion: accountSyncVersion } = useChainState({
     cacheKeys: publicKey ? [`account:${publicKey}`, `reputation:${publicKey}`] : ['wallet'],
   });
@@ -197,10 +201,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
 
     const currentPublicKey = publicKey;
+    const currentHorizonUrl = horizonUrl;
 
     async function refreshReputation() {
       try {
-        const nextReputation = await getReputation(currentPublicKey);
+        const nextReputation = await getReputation(currentPublicKey, currentHorizonUrl);
         if (reputationRequestIdRef.current === requestId) {
           setReputation(nextReputation);
         }
@@ -219,7 +224,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     return () => {
       reputationRequestIdRef.current += 1;
     };
-  }, [accountSyncVersion, publicKey]);
+  }, [accountSyncVersion, publicKey, horizonUrl]);
 
   useEffect(() => {
     const handleAccountChange = () => {
